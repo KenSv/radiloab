@@ -6,57 +6,6 @@
 
 using namespace std;
 
-/*void getType(int* ptr, char* buf) {
-    unsigned int varType = *((int *) buf + (*ptr));
-    string typeName = "";
-//    bool flUnsigned, flInt, flArray = false;
-    if(varType & (DBIT_ARRAY|DBIT_ARRAY2|DBIT_ARRAY3))
-    {
-//        flArray = true;
-        typeName = "A";
-    } else {
-        typeName = "N";
-    }
-    switch(varType & 0xFF000000)
-    {
-        case DBIT_UNSIGNED:
-            cout << "DBIT_UNSIGNED" << endl;
-            typeName += "U";
- //           flUnsigned = true;
-        case DBIT_INT:
-            cout << "DBIT_INT" << endl;
- //           flInt = true;
-            typeName += "S";
-        default:
-            break;
-    }
-    unsigned int nb = (varType >> 24) & 0x0F;
-    unsigned int id = varType & 0x000000FF;
-    cout << "Id: " << id << " bytes: " << hex << nb <<endl;
-
-    switch (varType & 0x0F000000)
-    {
-        case 0x01000000:
-            typeName += "08";
-            break;
-        case  0x02000000:
-            typeName += "16";
-            break;
-        case 0x04000000:
-            typeName += "32";
-            break;
-        case 0x08000000:
-            typeName += "64";
-            break;
-        default:
-            break;
-    }
-
-    *ptr +=4 + nb;
-    cout << "Тип: " << typeName << " Значение: " << hex << varType << " Ptr: " << *ptr << endl;
-
-} */
-
 void getType2(char** buf) {
     unsigned int varType = *((int *) *buf);
     string typeName = "";

@@ -1,6 +1,7 @@
 #pragma once
 //---------------------------------------------------------------------
-#if !defined(_WIN32) && !defined(_LINUX)
+//#if !defined(_WIN32) && !defined(_LINUX)
+#if !defined(_WIN32) && !defined(__linux)
 #error "OS not specified!"
 #endif
 //---------------------------------------------------------------------
