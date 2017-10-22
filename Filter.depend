@@ -1,0 +1,10 @@
+# depslib dependency file v1.0
+1508700973 source:/home/skn/mypro/cpp/radiolab/main.cpp
+	<iostream>
+	<fstream>
+	<string.h>
+	<unistd.h>
+	"db.h"
+
+1507665915 /home/skn/mypro/cpp/radiolab/db.h
+

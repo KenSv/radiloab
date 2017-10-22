@@ -6,7 +6,7 @@
 
 using namespace std;
 
-void getType2(char** buf) {
+void getType(char** buf) {
     unsigned int varType = *((int *) *buf);
     string typeName = "";
     if(varType & (DBIT_ARRAY|DBIT_ARRAY2|DBIT_ARRAY3))
@@ -66,14 +66,9 @@ void getType2(char** buf) {
         }
         *buf += nb;
     }
-
-
     // << hex << (long) (*buf)
     cout << "Тип: " << typeName << " Код типа: 0x" << hex << varType << " Значение: " << value << endl;
-
 }
-
-
 
 int main(int argc, char* argv[])
 {
@@ -99,14 +94,6 @@ int main(int argc, char* argv[])
        exit(1);
    }
 
-// вариант с побайтовым чтением
-/*
-    while(in){
-        in.get(ch);
-        out.put(ch);
-    }
-*/
-
 // вариант с чтением/записью посредством буфера
     in.seekg(0, in.end);
     length = in.tellg();
@@ -119,11 +106,7 @@ int main(int argc, char* argv[])
     char* readPtr = buf;
 //	int ptr = 0;
 	while(readPtr < &buf[length]) {
-//	    for(int n=0; n < 50; n++)
-//	    {
-//            getType(&ptr, buf);
-            getType2(&readPtr);
-//	    }
+        getType(&readPtr);
 	}
 
         out.write(buf, length);
