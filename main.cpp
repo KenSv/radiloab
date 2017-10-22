@@ -1,19 +1,136 @@
 #include <iostream>
 #include <fstream>
+#include <string.h>
 #include <unistd.h>
+#include "db.h"
 
 using namespace std;
 
-void read_type(&cur_ptr) {
+/*void getType(int* ptr, char* buf) {
+    unsigned int varType = *((int *) buf + (*ptr));
+    string typeName = "";
+//    bool flUnsigned, flInt, flArray = false;
+    if(varType & (DBIT_ARRAY|DBIT_ARRAY2|DBIT_ARRAY3))
+    {
+//        flArray = true;
+        typeName = "A";
+    } else {
+        typeName = "N";
+    }
+    switch(varType & 0xFF000000)
+    {
+        case DBIT_UNSIGNED:
+            cout << "DBIT_UNSIGNED" << endl;
+            typeName += "U";
+ //           flUnsigned = true;
+        case DBIT_INT:
+            cout << "DBIT_INT" << endl;
+ //           flInt = true;
+            typeName += "S";
+        default:
+            break;
+    }
+    unsigned int nb = (varType >> 24) & 0x0F;
+    unsigned int id = varType & 0x000000FF;
+    cout << "Id: " << id << " bytes: " << hex << nb <<endl;
+
+    switch (varType & 0x0F000000)
+    {
+        case 0x01000000:
+            typeName += "08";
+            break;
+        case  0x02000000:
+            typeName += "16";
+            break;
+        case 0x04000000:
+            typeName += "32";
+            break;
+        case 0x08000000:
+            typeName += "64";
+            break;
+        default:
+            break;
+    }
+
+    *ptr +=4 + nb;
+    cout << "Тип: " << typeName << " Значение: " << hex << varType << " Ptr: " << *ptr << endl;
+
+} */
+
+void getType2(char** buf) {
+    unsigned int varType = *((int *) *buf);
+    string typeName = "";
+    if(varType & (DBIT_ARRAY|DBIT_ARRAY2|DBIT_ARRAY3))
+    {
+        typeName = "A";
+        switch (varType & 0x30000000)
+        {
+        case DBIT_ARRAY2:
+            typeName += "2D";
+            break;
+        case DBIT_ARRAY3:
+            typeName += "3D";
+            break;
+        default:
+            typeName += "1D";
+            break;
+        }
+    } else {
+        typeName = "  N";
+    }
+
+    typeName += ((varType & 0xC0000000)? "U": "S");
+    unsigned int nb = (varType >> 24) & 0x0F;
+//    unsigned int id = varType & 0x000000FF;
+//    cout << "Id: " << id << " bytes: " << hex << nb <<endl;
+
+    typeName +=  (nb == 1? "0": "\0") + to_string(nb << 3);
+
+    *buf += 4;  // указатель на значение переменной
+    long value;
+    int arItems;
+    if (typeName[0] == 'A')
+    {
+        arItems = *((int *) *buf);
+//        cout << "array bytes: " << nb << endl;
+        *buf += sizeof(int) + arItems * nb;  // длина массива следует за типом значения - 4 байта?
+        value = arItems;
+    }
+    else
+    {
+        switch (nb)
+        {
+        case 1:
+            value = *((char *) *buf);
+            break;
+        case 2:
+            value = *((short *) *buf);
+            break;
+        case 4:
+            value = *((int *) *buf);
+            break;
+        case 8:
+            value = *((long *) *buf);
+            break;
+        default:
+            break;
+        }
+        *buf += nb;
+    }
+
+
+    // << hex << (long) (*buf)
+    cout << "Тип: " << typeName << " Код типа: 0x" << hex << varType << " Значение: " << value << endl;
 
 }
+
 
 
 int main(int argc, char* argv[])
 {
    char dirName[1000];
 //   char ch; // для варианта с побайтовой обработкой
-   long int length, i;
+   long int length;
    ifstream in;
    ofstream out;
    char *fname = new char [28];
@@ -21,7 +138,7 @@ int main(int argc, char* argv[])
     if (argc > 1) {
         fname = argv[1];
     } else {
-        fname = "2017_09_13_12_54_32_333.riq";
+        strcpy(fname, "2017_09_13_12_54_32_333.riq");
     }
    cout << "File name: " << fname << endl;
    in.open(fname, ios::in | ios::binary);
@@ -41,24 +158,6 @@ int main(int argc, char* argv[])
     }
 */
 
-    cout << "Byte order" << endl;
-    in.seekg(0);
-    char *buf1 = new char[4];
-    in.read((char *) buf1, 4);
-//   int v = 0xc4000001;
-//   int *ptr = v;
-    for (i = 0; i < 4 ; i++) {
-        cout << i << ": " << (int) buf1[i] << endl;
-        out.write(&buf1[i], 1);
-    }
-
-//   out.write(buf1, 1);
-   delete [] buf1;
-   in.close();
-   out.close();
-   exit(0);
-
-
 // вариант с чтением/записью посредством буфера
     in.seekg(0, in.end);
     length = in.tellg();
@@ -68,6 +167,16 @@ int main(int argc, char* argv[])
         in.seekg(0);
         in.read((char *) buf, length);
 //        in.read((char *) & str, sizeof(str_type));     // вариант с чтением структуры str_type
+    char* readPtr = buf;
+//	int ptr = 0;
+	while(readPtr < &buf[length]) {
+//	    for(int n=0; n < 50; n++)
+//	    {
+//            getType(&ptr, buf);
+            getType2(&readPtr);
+//	    }
+	}
+
         out.write(buf, length);
 // жаль нет finally. Остаток кода нужно бы поместить туда :)
 // Если через класс, то уничтожать переменные/буферы в деструкторе ?
