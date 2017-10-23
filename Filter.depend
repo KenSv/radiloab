@@ -8,3 +8,12 @@
 
 1507665915 /home/skn/mypro/cpp/radiolab/db.h
 
+1508781392 source:/home/skn/mypro/cpp/radiloab/main.cpp
+	<iostream>
+	<fstream>
+	<string.h>
+	<unistd.h>
+	"db.h"
+
+1508781276 /home/skn/mypro/cpp/radiloab/db.h
+
