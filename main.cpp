@@ -3,6 +3,7 @@
 #include <string.h>
 #include <unistd.h>
 #include "db.h"
+#include "include/Riq.h"
 
 using namespace std;
 
@@ -105,8 +106,12 @@ int main(int argc, char* argv[])
 //        in.read((char *) & str, sizeof(str_type));     // вариант с чтением структуры str_type
     char* readPtr = buf;
 //	int ptr = 0;
+    Riq riq;
 	while(readPtr < &buf[length]) {
-        getType(&readPtr);
+//        getType(&readPtr);
+
+        if(!riq.parseVar(&readPtr))
+            riq.parseArray(&readPtr);
 	}
 
         out.write(buf, length);

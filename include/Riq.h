@@ -7,9 +7,9 @@ class Riq
     public:
         Riq();
         virtual ~Riq();
-
+        bool parseVar(char** buf);
+        bool parseArray(char** buf);
     protected:
-
     private:
 };
 

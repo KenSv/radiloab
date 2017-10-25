@@ -1,10 +1,11 @@
 # depslib dependency file v1.0
-1508700973 source:/home/skn/mypro/cpp/radiolab/main.cpp
+1508961656 source:/home/skn/mypro/cpp/radiolab/main.cpp
 	<iostream>
 	<fstream>
 	<string.h>
 	<unistd.h>
 	"db.h"
+	"include/Riq.h"
 
 1507665915 /home/skn/mypro/cpp/radiolab/db.h
 
@@ -16,4 +17,11 @@
 	"db.h"
 
 1508781276 /home/skn/mypro/cpp/radiloab/db.h
+
+1508962153 source:/home/skn/mypro/cpp/radiolab/src/Riq.cpp
+	<iostream>
+	"../db.h"
+	"../include/Riq.h"
+
+1508961620 /home/skn/mypro/cpp/radiolab/include/Riq.h
 
