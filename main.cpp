@@ -110,6 +110,7 @@ int main(int argc, char* argv[])
 	while(readPtr < &buf[length]) {
 //        getType(&readPtr);
 
+        cout << (unsigned int) (readPtr -buf) << " ";
         if(!riq.parseVar(&readPtr))
             riq.parseArray(&readPtr);
 	}
