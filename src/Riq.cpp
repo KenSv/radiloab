@@ -19,7 +19,7 @@ bool Riq::parseArray(char** buf)
     unsigned int varType = *((int *) *buf);
     unsigned int nb = (varType >> 24) & 0x0F;
     *buf += 4;
-    int arItems = *((int *) *buf);
+    unsigned int arItems = *((int *) *buf);
     *buf += sizeof(int); // длина массива следует за типом значения - 4 байта?
 //    value = arItems;
 
@@ -65,6 +65,8 @@ bool Riq::parseArray(char** buf)
         break;
     case DBI_FRAMES:
         cout << " - типы представления фреймов в каждом окне" << endl;
+//        cout << hex << buf << *buf << nb << arItems << endl;
+        printf(/*"buf: %x *buf: %x*/ "nb: %i items: %i \n", nb, arItems);
         break;
     case DBI_MD_NAME:
         cout << " - имя мультимедиа файла" << endl;
@@ -110,15 +112,14 @@ bool Riq::parseArray(char** buf)
         break;
     }
 
-    for (int i=0; i < arItems * nb; i++)
+/*    for (unsigned int i=0; i < arItems; i++)
     {
-        for (int j=0; j< nb; j++) {
-            cout << hex << *((char *) *(buf + i*j));
+        for (unsigned int j=0; j < nb; j++) {
+            cout << i+1 << hex << *((char *) *buf + (i*nb)+j) << " ";
         }
-        cout << " ";
+        cout << endl;
     }
-    cout << endl;
-
+*/
     *buf += arItems * nb;
     return true;
 }
@@ -174,7 +175,7 @@ bool Riq::parseVar(char** buf)
     case DBI_FMAX:
         value = *((double *) *buf);
         *buf += sizeof(double);
-        cout << hex << value << " - Конечная частота (МГц)" << endl;
+        cout << hex << itoa(value) << " - Конечная частота (МГц)" << endl;
         break;
     case DBI_FCUR:
         value = *((double *) *buf);
