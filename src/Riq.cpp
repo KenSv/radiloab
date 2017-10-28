@@ -87,13 +87,51 @@ bool Riq::parseArray(char** buf)
     case DBI_SUBGROUPNAME:
         cout << " - название под-группы эталона" << endl;
         break;
+    case DBI_THRR_OFFSETS:
+        cout << " - смещения порога записи" << endl;
+        break;
+    case DBI_SPLITTERS:
+        cout << " - разделители окна" << endl;
+        break;
+    case DBI_CHAN_STATES:
+        cout << " - состояния каналов" << endl;
+        break;
+// пользователи
+    case DBI_USER_LOGIN:
+        cout << " - логин пользователя" << endl;
+        break;
+    case DBI_USER_NAME:
+        cout << " - полное имя пользователя" << endl;
+        break;
+    case DBI_USER_AVATAR:
+        cout << " - аватар пользователя" << endl;
+        break;
+    case DBI_USER_PASSWD:
+        cout << " - хеш пароля пользователя" << endl;
+        break;
+
+// проекты
+    case DBI_PROJ_NAME:
+        cout << " - имя проекта" << endl;
+        break;
+    case DBI_PROJ_PASSWD:
+        cout << " - хеш пароля проекта" << endl;
+        break;
+    case DBI_PROJ_DATA_DIR:
+        cout << " - папка для сохранения файлов" << endl;
+        break;
+    case DBI_PROJ_OPTIONS:
+        cout << " - опции проекта" << endl;
+        break;
+
+// приёмники
+    case DBI_RCV_NAME:
+        cout << " - имя приёмника" << endl;
+        break;
+    case DBI_RCV_CHN_NAME:
+        cout << " - имя канала приёмника" << endl;
+        break;
 /*    case :
-        cout << " - " << endl;
-        break;
-    case :
-        cout << " - " << endl;
-        break;
-    case :
         cout << " - " << endl;
         break;
     case :
@@ -327,30 +365,88 @@ bool Riq::parseVar(char** buf)
         *buf += sizeof(int);
         cout << hex << value << " - размер по вертикали" << endl;
         break;
-/*
-#define DBI_STYPE			(0x00000040|DBIT_U8)	// тип сигнала
-#define DBI_MTYPE			(0x00000041|DBIT_U8)	// тип модуляции
-#define DBI_ACOUNT			(0x00000042|DBIT_S16)	// счётчик активности
-#define DBI_TCOUNT			(0x00000043|DBIT_U32)	// счётчик общего числа обнаружений
-#define DBI_NRCV			(0x00000044|DBIT_S32)	// количество приёмников, на которых сигнал был найден
-*/
+    case DBI_STYPE:
+        value = *((unsigned char *) *buf);
+        *buf += sizeof(char);
+        cout << hex << value << " - тип сигнала" << endl;
+        break;
+    case DBI_MTYPE:
+        value = *((unsigned char *) *buf);
+        *buf += sizeof(char);
+        cout << hex << value << " - тип модуляции" << endl;
+        break;
+     case DBI_ACOUNT:
+        value = *((short *) *buf);
+        *buf += sizeof(short);
+        cout << hex << value << " - счётчик активности" << endl;
+        break;
+     case DBI_TCOUNT:
+        value = *((unsigned int *) *buf);
+        *buf += sizeof(int);
+        cout << hex << value << " - счётчик общего числа обнаружений" << endl;
+        break;
+     case DBI_NRCV:
+        value = *((int *) *buf);
+        *buf += sizeof(int);
+        cout << hex << value << " - количество приёмников, на которых сигнал был найден" << endl;
+        break;
+     case DBI_CHANNEL:
+        value = *((unsigned short *) *buf);
+        *buf += sizeof(short);
+        cout << hex << value << " - номер канала по стандарту" << endl;
+        break;
 
-/*
-#define DBI_CHANNEL			(0x00000049|DBIT_U16)	// номер канала по стандарту
+     case DBI_CLVL:
+        value = *((double *) *buf);
+        *buf += sizeof(double);
+        cout << hex << value << " - текущий уровень" << endl;
+        break;
+     case DBI_MLVL:
+        value = *((double *) *buf);
+        *buf += sizeof(double);
+        cout << hex << value << " - максимальный уровень" << endl;
+        break;
+     case DBI_RLVL:
+        value = *((double *) *buf);
+        *buf += sizeof(double);
+        cout << hex << value << " - опорный уровень" << endl;
+        break;
+     case DBI_NLVL:
+        value = *((double *) *buf);
+        *buf += sizeof(double);
+        cout << hex << value << " - уровень шума" << endl;
+        break;
 
-#define DBI_CLVL			(0x00000050|DBIT_F64)	// текущий уровень
-#define DBI_MLVL			(0x00000051|DBIT_F64)	// максимальный уровень
-#define DBI_RLVL			(0x00000052|DBIT_F64)	// опорный уровень
-#define DBI_NLVL			(0x00000053|DBIT_F64)	// уровень шума
-
-#define DBI_AZIMUTH			(0x00000052|DBIT_S16)	// азимут
-#define DBI_ELEVATION		(0x00000053|DBIT_S16)	// угол места
-
-#define DBI_DTIME			(0x00000055|DBIT_S64)	// время обнаружения
-#define DBI_FTIME			(0x00000056|DBIT_S64)	// время первого появления
-#define DBI_LTIME			(0x00000057|DBIT_S64)	// время последнего появления
-#define DBI_MTIME			(0x00000058|DBIT_S64)	// время максимального уровня
-*/
+     case DBI_AZIMUTH:
+        value = *((short *) *buf);
+        *buf += sizeof(short);
+        cout << hex << value << " - азимут" << endl;
+        break;
+     case DBI_ELEVATION:
+        value = *((short *) *buf);
+        *buf += sizeof(short);
+        cout << hex << value << " - угол места" << endl;
+        break;
+     case DBI_DTIME:
+        value = *((long *) *buf);
+        *buf += sizeof(long);
+        cout << hex << value << " - время обнаружения" << endl;
+        break;
+     case DBI_FTIME:
+        value = *((long *) *buf);
+        *buf += sizeof(long);
+        cout << hex << value << " - время первого появления" << endl;
+        break;
+     case DBI_LTIME:
+        value = *((long *) *buf);
+        *buf += sizeof(long);
+        cout << hex << value << " - время последнего появления" << endl;
+        break;
+     case DBI_MTIME:
+        value = *((long *) *buf);
+        *buf += sizeof(long);
+        cout << hex << value << " - время максимального уровня" << endl;
+        break;
 
 /*
 #define DBI_VFILTER			(0x00000062|DBIT_U16)	// видеофильтр
@@ -419,26 +515,251 @@ bool Riq::parseVar(char** buf)
         *buf += sizeof(int);
         cout << hex << value << " - тип окна БПФ" << endl;
         break;
-/*#define DBI_DBW 			(0x0000007C|DBIT_F64)	// ширина полосы демодуляции
-#define DBI_VBW 			(0x0000007D|DBIT_F64)	// разрешение по частоте
-#define DBI_BW 				(0x0000007F|DBIT_F64)	// ширина полосы
-#define DBI_THRW			(0x00000080|DBIT_F64)	// порог водопада
-#define DBI_THRR			(0x00000081|DBIT_F64)	// порог записи
-#define DBI_THRR_OFFSETS	(0x00000081|DBIT_AF64)	// смещения порога записи
-#define DBI_THRS			(0x00000082|DBIT_F64)	// порог обнаружения относительно уровня шума
-#define DBI_THR_TYPE		(0x00000083|DBIT_U32)	// тип порога записи
-#define DBI_THR_APASS		(0x00000085|DBIT_U32)	// число превышений для активности
-#define DBI_THR_IAPASS		(0x00000086|DBIT_U32)	// число проходов без превышения для неактивности
-#define DBI_SCALE			(0x00000087|DBIT_F64)	// масштаб по оси частот
-#define DBI_SOD_SCALE		(0x00000088|DBIT_U32)	// режим выбора границ спектра осциллографа детектора
-#define DBI_DMD_TYPE		(0x00000089|DBIT_U32)	// тип демодулятора
-#define DBI_DBANDWIDTH		(0x0000008A|DBIT_F64)	// полоса демодулятора
-#define DBI_YFMIN 			(0x0000008B|DBIT_F64)	// Нижняя граница спектра
-#define DBI_YFMAX 			(0x0000008C|DBIT_F64)	// Верхняя граница спектра
-#define DBI_SPLITTERS		(0x0000008D|DBIT_AF32)	// разделители окна
-#define DBI_TGRAM_MIN 		(0x0000008E|DBIT_F64)	// Нижняя граница топограмы
-#define DBI_TGRAM_MAX 		(0x0000008F|DBIT_F64)	// Верхняя граница топограмы
-#define DBI_TRACES			(0x00000090|DBIT_U32)	// флаги трасс
+     case DBI_DBW:
+        value = *((double *) *buf);
+        *buf += sizeof(double);
+        cout << hex << value << " - ширина полосы демодуляции" << endl;
+        break;
+     case DBI_VBW:
+        value = *((double *) *buf);
+        *buf += sizeof(double);
+        cout << hex << value << " - разрешение по частоте" << endl;
+        break;
+     case DBI_BW:
+        value = *((double *) *buf);
+        *buf += sizeof(double);
+        cout << hex << value << " - ширина полосы" << endl;
+        break;
+     case DBI_THRW:
+        value = *((double *) *buf);
+        *buf += sizeof(double);
+        cout << hex << value << " - порог водопада" << endl;
+        break;
+     case DBI_THRR:
+        value = *((double *) *buf);
+        *buf += sizeof(double);
+        cout << hex << value << " - порог записи" << endl;
+        break;
+     case DBI_THRS:
+        value = *((double *) *buf);
+        *buf += sizeof(double);
+        cout << hex << value << " - порог обнаружения относительно уровня шума" << endl;
+        break;
+     case DBI_THR_TYPE:
+        value = *((unsigned int *) *buf);
+        *buf += sizeof(int);
+        cout << hex << value << " - тип порога записи" << endl;
+        break;
+     case DBI_THR_APASS:
+        value = *((unsigned int *) *buf);
+        *buf += sizeof(int);
+        cout << hex << value << " - число превышений для активности" << endl;
+        break;
+     case DBI_THR_IAPASS:
+        value = *((unsigned int *) *buf);
+        *buf += sizeof(int);
+        cout << hex << value << " - число проходов без превышения для неактивности" << endl;
+        break;
+     case DBI_SCALE:
+        value = *((double *) *buf);
+        *buf += sizeof(double);
+        cout << hex << value << " - масштаб по оси частот" << endl;
+        break;
+     case DBI_SOD_SCALE:
+        value = *((unsigned int *) *buf);
+        *buf += sizeof(int);
+        cout << hex << value << " - режим выбора границ спектра осциллографа детектора" << endl;
+        break;
+     case DBI_DMD_TYPE:
+        value = *((unsigned int *) *buf);
+        *buf += sizeof(int);
+        cout << hex << value << " - тип демодулятора" << endl;
+        break;
+     case DBI_DBANDWIDTH:
+        value = *((double *) *buf);
+        *buf += sizeof(double);
+        cout << hex << value << " - полоса демодулятора" << endl;
+        break;
+     case DBI_YFMIN:
+        value = *((double *) *buf);
+        *buf += sizeof(double);
+        cout << hex << value << " - Нижняя граница спектра" << endl;
+        break;
+     case DBI_YFMAX:
+        value = *((double *) *buf);
+        *buf += sizeof(double);
+        cout << hex << value << " - Верхняя граница спектра" << endl;
+        break;
+     case DBI_TGRAM_MIN:
+        value = *((double *) *buf);
+        *buf += sizeof(double);
+        cout << hex << value << " - Нижняя граница топограмы" << endl;
+        break;
+     case DBI_TGRAM_MAX:
+        value = *((double *) *buf);
+        *buf += sizeof(double);
+        cout << hex << value << " - Верхняя граница топограмы" << endl;
+        break;
+     case DBI_TRACES:
+        value = *((unsigned int *) *buf);
+        *buf += sizeof(int);
+        cout << hex << value << " - флаги трасс" << endl;
+        break;
+// каналы
+     case DBI_CHAN_ASTATES:
+        value = *((int *) *buf);
+        *buf += sizeof(int);
+        cout << hex << value << " - количество состояний каналов" << endl;
+        break;
+     case DBI_CHAN_NPARTS:
+        value = *((int *) *buf);
+        *buf += sizeof(int);
+        cout << hex << value << " - количество частей столбца" << endl;
+        break;
+/*
+// пользователи
+#define DBI_USER_ID			(0x00000110|DBIT_U32)	// ID пользователя
+     case DBI_TRACES:
+        value = *((unsigned int *) *buf);
+        *buf += sizeof(int);
+        cout << hex << value << " - флаги трасс" << endl;
+        break;
+
+// проекты
+#define DBI_PROJ_FLAGS		(0x00000120|DBIT_U32)	// флаги проекта
+     case DBI_TRACES:
+        value = *((unsigned int *) *buf);
+        *buf += sizeof(int);
+        cout << hex << value << " - флаги трасс" << endl;
+        break;
+#define DBI_PROJ_CREATED	(0x00000120|DBIT_S64)	// когда создан
+#define DBI_PROJ_CREATED_BY	(0x00000121|DBIT_U32)	// кем создан
+     case DBI_TRACES:
+        value = *((unsigned int *) *buf);
+        *buf += sizeof(int);
+        cout << hex << value << " - флаги трасс" << endl;
+        break;
+#define DBI_PROJ_OPENED		(0x00000121|DBIT_S64)	// когда открыт последний раз
+#define DBI_PROJ_OPENED_BY	(0x00000122|DBIT_U32)	// кем открыт последний раз
+     case DBI_TRACES:
+        value = *((unsigned int *) *buf);
+        *buf += sizeof(int);
+        cout << hex << value << " - флаги трасс" << endl;
+        break;
+#define DBI_PROJ_DEF_RCV	(0x00000120|DBIT_S32)	// приёмник по умолчанию (панорама)
+#define DBI_PROJ_DEF_ARCV	(0x00000121|DBIT_S32)	// приёмник по умолчанию (панорама)
+
+// приёмники
+#define DBI_RCV_FLAGS		(0x00000130|DBIT_U32)	// флаги приёмника
+     case DBI_TRACES:
+        value = *((unsigned int *) *buf);
+        *buf += sizeof(int);
+        cout << hex << value << " - флаги трасс" << endl;
+        break;
+#define DBI_RCV_COLOR		(0x00000131|DBIT_U32)	// цвет приёмника
+     case DBI_TRACES:
+        value = *((unsigned int *) *buf);
+        *buf += sizeof(int);
+        cout << hex << value << " - флаги трасс" << endl;
+        break;
+#define DBI_RCV_CHN_CVR_UIN	(0x00000132|DBIT_U64)	// ID конвертера канала приёмника
+#define DBI_RCV_CHN_FLAGS	(0x00000132|DBIT_U32)	// флаги канала приёмника
+     case DBI_TRACES:
+        value = *((unsigned int *) *buf);
+        *buf += sizeof(int);
+        cout << hex << value << " - флаги трасс" << endl;
+        break;
+
+// правила
+#define DBI_RULE_FREQ_USE	(0x00000140|DBIT_U32)	// использование границ частоты
+     case DBI_TRACES:
+        value = *((unsigned int *) *buf);
+        *buf += sizeof(int);
+        cout << hex << value << " - флаги трасс" << endl;
+        break;
+#define DBI_RULE_BAND_USE	(0x00000141|DBIT_U32)	// использование границ полосы
+     case DBI_TRACES:
+        value = *((unsigned int *) *buf);
+        *buf += sizeof(int);
+        cout << hex << value << " - флаги трасс" << endl;
+        break;
+#define DBI_RULE_REFD_USE	(0x00000140|DBIT_S32)	// использование опорного уровня
+#define DBI_RULE_STAT_USE	(0x00000141|DBIT_S32)	// использование стационарности
+#define DBI_RULE_LAST_USE	(0x00000142|DBIT_U32)	// использование последнего времени
+     case DBI_TRACES:
+        value = *((unsigned int *) *buf);
+        *buf += sizeof(int);
+        cout << hex << value << " - флаги трасс" << endl;
+        break;
+#define DBI_RULE_DESC_USE	(0x00000143|DBIT_U32)	// использование нового описания
+     case DBI_TRACES:
+        value = *((unsigned int *) *buf);
+        *buf += sizeof(int);
+        cout << hex << value << " - флаги трасс" << endl;
+        break;
+
+// сигналы/связи
+#define DBI_SGN_COUNT		(0x00000150|DBIT_U32)	// количество сигналов
+     case DBI_TRACES:
+        value = *((unsigned int *) *buf);
+        *buf += sizeof(int);
+        cout << hex << value << " - флаги трасс" << endl;
+        break;
+#define DBI_LNK_COUNT		(0x00000151|DBIT_U32)	// количество связей
+     case DBI_TRACES:
+        value = *((unsigned int *) *buf);
+        *buf += sizeof(int);
+        cout << hex << value << " - флаги трасс" << endl;
+        break;
+#define DBI_NET_COUNT		(0x00000152|DBIT_U32)	// количество связей
+     case DBI_TRACES:
+        value = *((unsigned int *) *buf);
+        *buf += sizeof(int);
+        cout << hex << value << " - флаги трасс" << endl;
+        break;
+#define DBI_TYPE			(0x00000153|DBIT_U32)	// логический тип устройства / тип сигнала
+     case DBI_TRACES:
+        value = *((unsigned int *) *buf);
+        *buf += sizeof(int);
+        cout << hex << value << " - флаги трасс" << endl;
+        break;
+#define DBI_STATE			(0x00000154|DBIT_U32)	// дополнительные данные о состоянии
+     case DBI_TRACES:
+        value = *((unsigned int *) *buf);
+        *buf += sizeof(int);
+        cout << hex << value << " - флаги трасс" << endl;
+        break;
+#define DBI_DEV_CHANEL		(0x00000155|DBIT_U32)	// дополнительные данные о состоянии
+     case DBI_TRACES:
+        value = *((unsigned int *) *buf);
+        *buf += sizeof(int);
+        cout << hex << value << " - флаги трасс" << endl;
+        break;
+#define DBI_BT_FEAT			(0x00000156|DBIT_U32)	// особенности Bluetooth
+     case DBI_TRACES:
+        value = *((unsigned int *) *buf);
+        *buf += sizeof(int);
+        cout << hex << value << " - флаги трасс" << endl;
+        break;
+
+#define DBI_ID				(0x00000150|DBIT_U64)	// идентификатор
+#define DBI_ID2				(0x00000151|DBIT_U64)	// идентификатор 2
+#define DBI_ID3				(0x00000152|DBIT_U64)	// идентификатор 3
+#define DBI_ID4				(0x00000153|DBIT_U64)	// идентификатор 4
+#define DBI_DATA_TX			(0x00000154|DBIT_U64)	// передано
+#define DBI_DATA_RX			(0x00000155|DBIT_U64)	// принято
+#define DBI_BTS_IMEI		(0x00000157|DBIT_U64)	// IMEI
+
+#define DBI_DEV_TYPE		(0x00000150|DBIT_S32)	// тип устройства
+#define DBI_LINKS			(0x00000151|DBIT_S32)	// количество связей
+
+#define DBI_WF_STD			(0x00000150|DBIT_U16)	// стандарт WiFi
+#define DBI_WF_SEC			(0x00000151|DBIT_U16)	// безопасность WiFi
+#define DBI_ZB_PAN			(0x00000152|DBIT_U16)	// ID сети ZigBee
+#define DBI_CELL_LAC		(0x00000154|DBIT_U16)	// LAC
+#define DBI_CELL_BSIC		(0x00000155|DBIT_U16)	// BSIC
+#define DBI_BTS_MCC			(0x00000156|DBIT_U16)	// MCC
+#define DBI_BTS_MNC			(0x00000157|DBIT_U16)	// MNC
 */
 
     default:
