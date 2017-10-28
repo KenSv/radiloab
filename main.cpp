@@ -73,32 +73,34 @@ void getType(char** buf) {
 
 int main(int argc, char* argv[])
 {
-   char dirName[1000];
+    char dirName[1000];
 //   char ch; // для варианта с побайтовой обработкой
-   long int length;
-   ifstream in;
-   ofstream out;
-   char *fname = new char [28];
-   cout << "Current path: " << getcwd(dirName, sizeof(dirName)) << endl;
+    long int length;
+    ifstream in;
+    ofstream out;
+    char *fname = new char [28];
+    cout << "Current path: " << getcwd(dirName, sizeof(dirName)) << endl;
     if (argc > 1) {
         fname = argv[1];
     } else {
         strcpy(fname, "2017_09_13_12_54_32_333.riq");
     }
-   cout << "File name: " << fname << endl;
-   in.open(fname, ios::in | ios::binary);
-   out.open("out.riq", ios::out | ios::binary);
+    cout << "File name: " << fname << endl;
+    in.open(fname, ios::in | ios::binary);
+    out.open("out.riq", ios::out | ios::binary);
 
-   if (!in) {
-       length = in.tellg();
-       cout << "Error opening file ";
-       exit(1);
-   }
+    if (!in) {
+        length = in.tellg();
+        cout << "Error opening file ";
+        exit(1);
+    }
 
 // вариант с чтением/записью посредством буфера
     in.seekg(0, in.end);
     length = in.tellg();
     cout << "File length: " << length << endl;
+    cout << "========================================" << endl << endl;
+
     char *buf = new char [length];
     try {
         in.seekg(0);
