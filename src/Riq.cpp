@@ -14,6 +14,39 @@ Riq::~Riq()
     //dtor
 }
 
+void Riq::dumpArray(char** buf, unsigned int bytes, unsigned int items, unsigned short itemsOnLine)
+{
+    for (unsigned int i=0; i < items; i++)
+    {
+        switch (bytes)
+        {
+            case 1:
+                printf("%4d ", *((char *) *buf + i*bytes));
+                break;
+            case 2:
+                printf("%6d ", *((short *) *buf + i*bytes));
+                break;
+            case 4:
+                printf("%10d ", *((int *) *buf + i*bytes));
+                break;
+            case 8:
+                printf("%f ", *((double *) *buf + i*bytes));
+                break;
+            default:
+                break;
+        }
+        if ((i+1)%itemsOnLine == 0) cout << endl;
+    }
+}
+
+void Riq::dumpTimeStamp(char** buf, const char* msg)
+{
+//    time_t tm = (time_t *) *buf;
+//    printf("%s: %s", msg, ctime(tm));
+    printf("%s: %s", msg, ctime((time_t *) *buf));
+    *buf += 8;
+}
+
 bool Riq::parseArray(char** buf)
 {
     unsigned int varType = *((int *) *buf);
@@ -28,124 +61,117 @@ bool Riq::parseArray(char** buf)
     switch (varType)
     {
     case DBI_IQDATA_S16:
-        cout << " - Q-канал (_s16)" << endl;
+        cout << " Q-канал (_s16)" << endl;
         break;
     case DBI_IQDATA_F64:
-        cout << " - IQ-данные (_f64)" << endl;
+        cout << " IQ-данные (_f64)" << endl;
         break;
     case DBI_ODATA_S16:
-        cout << " - осциллограф (_s16)" << endl;
+        cout << " осциллограф (_s16)" << endl;
         break;
     case DBI_ODATA_F64:
-        cout << " - осциллограф (_f64)" << endl;
+        cout << " осциллограф (_f64)" << endl;
         break;
     case DBI_FFT_F64:
-        cout << " - спектр (_f64)" << endl;
+        cout << " спектр (_f64)" << endl;
         break;
     case DBI_FFT_U16:
-        cout << " - спектр (_s16)" << endl;
+        cout << " спектр (_s16)" << endl;
         break;
     case DBI_FFT_U8:
-        cout << " - спектр (_u8)" << endl;
+        cout << " спектр (_u8)" << endl;
         break;
     case DBI_FFT_F64_2D:
-        cout << " - 2D спектр (_f64)" << endl;
+        cout << " 2D спектр (_f64)" << endl;
         break;
     case DBI_TGRAM_F64:
-        cout << " - 2D топограма (_f64)" << endl;
+        cout << " 2D топограма (_f64)" << endl;
         break;
     case DBI_BYTEARRAY:
-        cout << " - массив данных" << endl;
+        cout << " массив данных" << endl;
         break;
     case DBI_DESC_S8:
-        cout << " - описание" << endl;
+        cout << " описание" << endl;
         break;
     case DBI_DESC_U16:
-        cout << " - описание" << endl;
+        cout << " описание" << endl;
         break;
     case DBI_FRAMES:
-        cout << " - типы представления фреймов в каждом окне" << endl;
+        cout << " типы представления фреймов в каждом окне" << endl;
 //        cout << hex << buf << *buf << nb << arItems << endl;
         printf(/*"buf: %x *buf: %x*/ "nb: %i items: %i \n", nb, arItems);
         break;
     case DBI_MD_NAME:
-        cout << " - имя мультимедиа файла" << endl;
+        cout << " имя мультимедиа файла" << endl;
         break;
     case DBI_CHAN_FFT:
-        cout << " - канальный спектр" << endl;
+        cout << " канальный спектр" << endl;
         break;
     case DBI_SIGN_MASK:
-        cout << " - маска сигнатуры" << endl;
+        cout << " маска сигнатуры" << endl;
         break;
     case DBI_NAME_S8:
-        cout << " - имя" << endl;
+        cout << " имя" << endl;
         break;
     case DBI_NAME_U16:
-        cout << " - " << endl;
+        cout << " " << endl;
         break;
     case DBI_GROUPNAME:
-        cout << " - название под-группы эталона" << endl;
+        cout << " название под-группы эталона" << endl;
         break;
     case DBI_SUBGROUPNAME:
-        cout << " - название под-группы эталона" << endl;
+        cout << " название под-группы эталона" << endl;
         break;
     case DBI_THRR_OFFSETS:
-        cout << " - смещения порога записи" << endl;
+        cout << " смещения порога записи" << endl;
         break;
     case DBI_SPLITTERS:
-        cout << " - разделители окна" << endl;
+        cout << " разделители окна" << endl;
         break;
     case DBI_CHAN_STATES:
-        cout << " - состояния каналов" << endl;
+        cout << " состояния каналов" << endl;
         break;
 // пользователи
     case DBI_USER_LOGIN:
-        cout << " - логин пользователя" << endl;
+        cout << " логин пользователя" << endl;
         break;
     case DBI_USER_NAME:
-        cout << " - полное имя пользователя" << endl;
+        cout << " полное имя пользователя" << endl;
         break;
     case DBI_USER_AVATAR:
-        cout << " - аватар пользователя" << endl;
+        cout << " аватар пользователя" << endl;
         break;
     case DBI_USER_PASSWD:
-        cout << " - хеш пароля пользователя" << endl;
+        cout << " хеш пароля пользователя" << endl;
         break;
 
 // проекты
     case DBI_PROJ_NAME:
-        cout << " - имя проекта" << endl;
+        cout << " имя проекта" << endl;
         break;
     case DBI_PROJ_PASSWD:
-        cout << " - хеш пароля проекта" << endl;
+        cout << " хеш пароля проекта" << endl;
         break;
     case DBI_PROJ_DATA_DIR:
-        cout << " - папка для сохранения файлов" << endl;
+        cout << " папка для сохранения файлов" << endl;
         break;
     case DBI_PROJ_OPTIONS:
-        cout << " - опции проекта" << endl;
+        cout << " опции проекта" << endl;
         break;
 
 // приёмники
     case DBI_RCV_NAME:
-        cout << " - имя приёмника" << endl;
+        cout << " имя приёмника" << endl;
         break;
     case DBI_RCV_CHN_NAME:
-        cout << " - имя канала приёмника" << endl;
+        cout << " имя канала приёмника" << endl;
         break;
     default:
         break;
     }
 
-/*    for (unsigned int i=0; i < arItems; i++)
-    {
-        for (unsigned int j=0; j < nb; j++) {
-            cout << i+1 << hex << *((char *) *buf + (i*nb)+j) << " ";
-        }
-        cout << endl;
-    }
-*/
-    cout << "========================================" << endl;
+    dumpArray(buf, nb, arItems, 32);
+    cout << "<<< Конец массива" << endl;
     *buf += arItems * nb;
     return true;
 }
@@ -249,9 +275,10 @@ bool Riq::parseVar(char** buf)
         cout << hex << value << " - общее число отсчётов" << endl;
         break;
     case DBI_RBW_KHZ:
-        value = *((unsigned short *) *buf);
+//        value = *((unsigned short *) *buf);
+        printf("%6u - rbw в кГц\n", *((unsigned short *) *buf));
         *buf += 2;
-        cout << hex << value << " - rbw в кГц" << endl;
+//        cout << hex << value << " - rbw в кГц" << endl;
         break;
 
     case DBI_NPACK:
@@ -276,25 +303,31 @@ bool Riq::parseVar(char** buf)
         break;
 
     case DBI_STIME:
-        value = *((long *) *buf);
-        *buf += 8;
-        cout << hex << value << " - время начала сканирования" << endl;
+//        value = *((long *) *buf);
+//        printf("Время начала сканирования: %s", ctime((time_t *) *buf));
+        dumpTimeStamp(buf, "Время начала сканирования");
+//        *buf += 8;
+//        cout << hex << value << " - время начала сканирования" << endl;
         break;
     case DBI_ETIME:
-        value = *((long *) *buf);
-        *buf += 8;
-        cout << hex << value << " - время конца сканирования" << endl;
+//        value = *((long *) *buf);
+        dumpTimeStamp(buf, "Время конца сканирования");
+//        printf("Время конца сканирования: %s", ctime((time_t *) *buf));
+//        *buf += 8;
+//        cout << hex << value << " - время конца сканирования" << endl;
         break;
     case DBI_CTIME:
-        value = *((unsigned int *) *buf);
+//        value = *((unsigned int *) *buf);
+        printf("%ui - время получения выборки\n", *((unsigned int *) *buf));
         *buf += 4;
-        cout << hex << value << " - время получения выборки" << endl;
+//        cout << hex << value << " - время получения выборки" << endl;
         break;
 
     case DBI_INDEX:
-        value = *((int *) *buf);
+//        value = *((int *) *buf);
+        printf("%i - номер выборки\n", *((int *) *buf));
         *buf += 4;
-        cout << hex << value << " - номер выборки" << endl;
+//        cout << hex << value << " - номер выборки" << endl;
         break;
     case DBI_OFFSET:
 //        value = *((long *) *buf);
@@ -428,26 +461,30 @@ bool Riq::parseVar(char** buf)
         break;
      case DBI_DTIME:
 //        value = *((long *) *buf);
-        printf("%li - время обнаружения\n", *((long *) *buf));
-        *buf += 8;
+        dumpTimeStamp(buf, "Время обнаружения");
+//        printf("Время обнаружения: %s", ctime((time_t *) *buf));
+//        *buf += 8;
 //        cout << hex << value << " - время обнаружения" << endl;
         break;
      case DBI_FTIME:
 //        value = *((long *) *buf);
-        printf("%li - время первого появления\n", *((long *) *buf));
-        *buf += 8;
+        dumpTimeStamp(buf, "Время первого появления");
+//        printf("%li - время первого появления\n", *((long *) *buf));
+//        *buf += 8;
 //        cout << hex << value << " - время первого появления" << endl;
         break;
      case DBI_LTIME:
 //        value = *((long *) *buf);
-        printf("%li - время последнего появления\n", *((long *) *buf));
-        *buf += 8;
+        dumpTimeStamp(buf, "Время последнего появления");
+//        printf("%li - время последнего появления\n", *((long *) *buf));
+//        *buf += 8;
 //        cout << hex << value << " - время последнего появления" << endl;
         break;
      case DBI_MTIME:
 //        value = *((long *) *buf);
-        printf("%li - время максимального уровня\n", *((long *) *buf));
-        *buf += 8;
+        dumpTimeStamp(buf, "Время максимального уровня");
+//        printf("%li - время максимального уровня\n", *((long *) *buf));
+//        *buf += 8;
 //        cout << hex << value << " - время максимального уровня" << endl;
         break;
 
