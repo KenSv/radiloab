@@ -34,3 +34,6 @@ bin/*
 
 # datagramma
 *.riq
+*.depend
+*.layout
+
