@@ -99,7 +99,9 @@ int main(int argc, char* argv[])
     in.seekg(0, in.end);
     length = in.tellg();
     cout << "File length: " << length << endl;
-    cout << "========================================" << endl << endl;
+    cout << "========================================" << endl;
+    cout << "  Адрес | Значение - Описание" << endl;
+    cout << "========================================" << endl;
 
     char *buf = new char [length];
     try {
@@ -112,7 +114,8 @@ int main(int argc, char* argv[])
 	while(readPtr < &buf[length]) {
 //        getType(&readPtr);
 
-        cout << (unsigned int) (readPtr -buf) << " ";
+//        cout << (unsigned int) (readPtr -buf) << " ";
+        printf("%8x ", (unsigned int) (readPtr -buf));
         if(!riq.parseVar(&readPtr))
             riq.parseArray(&readPtr);
 	}
