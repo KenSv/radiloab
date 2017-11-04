@@ -61,7 +61,7 @@ bool Riq::parseArray(char** buf)
     switch (varType)
     {
     case DBI_IQDATA_S16:
-        cout << " Q-канал (_s16)" << endl;
+        cout << " IQ-канал (_s16)" << endl;
         break;
     case DBI_IQDATA_F64:
         cout << " IQ-данные (_f64)" << endl;
@@ -232,14 +232,16 @@ bool Riq::parseVar(char** buf)
 //        cout << hex << value << " - Конечная частота (МГц)" << endl;
         break;
     case DBI_FCUR:
-        value = *((double *) *buf);
+//        value = *((double *) *buf);
+        printf("%lf - Центральная частота (МГц)\n", *((double *) *buf));
         *buf += 8;
-        cout << hex << value << " - Центральная частота (МГц)" << endl;
+//        cout << hex << value << " - Центральная частота (МГц)" << endl;
         break;
     case DBI_BAND:
-        value = *((double *) *buf);
-        *buf += 8;
-        cout << hex << value << " - полоса (МГц)" << endl;
+//        value = *((double *) *buf);
+        printf("%lf - полоса (МГц)\n", *((double *) *buf));
+       *buf += 8;
+//        cout << hex << value << " - полоса (МГц)" << endl;
         break;
     case DBI_GFMIN:
  //       value = *((double *) *buf);
@@ -254,9 +256,10 @@ bool Riq::parseVar(char** buf)
 //        cout << hex << value << " - общая конечная частота (МГц)" << endl;
         break;
     case DBI_FDIFF:
-        value = *((double *) *buf);
+//        value = *((double *) *buf);
+        printf("%lf - отклонение частоты (МГц)\n", *((double *) *buf));
         *buf += 8;
-        cout << hex << value << " - отклонение частоты (МГц)" << endl;
+//        cout << hex << value << " - отклонение частоты (МГц)" << endl;
         break;
 
     case DBI_COUNT:
@@ -292,14 +295,16 @@ bool Riq::parseVar(char** buf)
         cout << hex << value << " - всего выборок в пачке" << endl;
         break;
     case DBI_PEAK_MAX:
-        value = *((double *) *buf);
+//        value = *((double *) *buf);
+        printf("%lf - максимум пик-детектора\n", *((double *) *buf));
         *buf += 8;
-        cout << hex << value << " - максимум пик-детектора" << endl;
+//        cout << hex << value << " - максимум пик-детектора" << endl;
         break;
     case DBI_PEAK_MEAN:
-        value = *((double *) *buf);
+//        value = *((double *) *buf);
+        printf("%lf - среднее пик-детектора\n", *((double *) *buf));
         *buf += 8;
-        cout << hex << value << " - среднее пик-детектора" << endl;
+//        cout << hex << value << " - среднее пик-детектора" << endl;
         break;
 
     case DBI_STIME:
@@ -342,9 +347,10 @@ bool Riq::parseVar(char** buf)
         break;
 
      case DBI_DATA_GAIN:
-        value = *((double *) *buf);
+//        value = *((double *) *buf);
+        printf("%lf - множитель для перевода FFT в _f64\n", *((double *) *buf));
         *buf += 8;
-        cout << hex << value << " - множитель для перевода FFT в _f64" << endl;
+//        cout << hex << value << " - множитель для перевода FFT в _f64" << endl;
         break;
      case DBI_DATA_OFFSET:
 //        value = *((double *) *buf);
@@ -429,24 +435,28 @@ bool Riq::parseVar(char** buf)
         break;
 
      case DBI_CLVL:
-        value = *((double *) *buf);
+//        value = *((double *) *buf);
+        printf("%lf - текущий уровень\n", *((double *) *buf));
         *buf += 8;
-        cout << hex << value << " - текущий уровень" << endl;
+//        cout << hex << value << " - текущий уровень" << endl;
         break;
      case DBI_MLVL:
-        value = *((double *) *buf);
+//        value = *((double *) *buf);
+        printf("%lf - максимальный уровень\n", *((double *) *buf));
         *buf += 8;
-        cout << hex << value << " - максимальный уровень" << endl;
+//        cout << hex << value << " - максимальный уровень" << endl;
         break;
      case DBI_RLVL:
-        value = *((double *) *buf);
+//        value = *((double *) *buf);
+        printf("%lf - опорный уровень\n", *((double *) *buf));
         *buf += 8;
-        cout << hex << value << " - опорный уровень" << endl;
+//        cout << hex << value << " - опорный уровень" << endl;
         break;
      case DBI_NLVL:
-        value = *((double *) *buf);
+//        value = *((double *) *buf);
+        printf("%lf - уровень шума\n", *((double *) *buf));
         *buf += 8;
-        cout << hex << value << " - уровень шума" << endl;
+//        cout << hex << value << " - уровень шума" << endl;
         break;
 
      case DBI_AZIMUTH:
@@ -518,9 +528,10 @@ bool Riq::parseVar(char** buf)
 //        cout << hex << value << " - уровень шума дБм" << endl;
         break;
      case DBI_BANDWIDTH:
-        value = *((double *) *buf);
+//        value = *((double *) *buf);
+        printf("%lf - полоса сигнала Гц\n", *((double *) *buf));
         *buf += 8;
-        cout << hex << value << " - полоса сигнала Гц" << endl;
+//        cout << hex << value << " - полоса сигнала Гц" << endl;
         break;
 
      case DBI_FLAGS:
@@ -546,19 +557,22 @@ bool Riq::parseVar(char** buf)
 
 // Opt структура
      case DBI_AMPL:
-        value = *((double *) *buf);
+//        value = *((double *) *buf);
+        printf("%lf - Амплитуда\n", *((double *) *buf));
         *buf += 8;
-        cout << hex << value << " - Амплитуда" << endl;
+//        cout << hex << value << " - Амплитуда" << endl;
         break;
      case DBI_ATTEN:
-        value = *((double *) *buf);
+//        value = *((double *) *buf);
+        printf("%lf - аттенюатор\n", *((double *) *buf));
         *buf += 8;
-        cout << hex << value << " - аттенюатор" << endl;
+//        cout << hex << value << " - аттенюатор" << endl;
         break;
      case DBI_REF_LEVEL:
-        value = *((double *) *buf);
+//        value = *((double *) *buf);
+        printf("%lf - опорный уровень\n", *((double *) *buf));
         *buf += 8;
-        cout << hex << value << " - опорный уровень" << endl;
+//        cout << hex << value << " - опорный уровень" << endl;
         break;
      case DBI_NSAMPLES:
         value = *((unsigned int *) *buf);
@@ -571,14 +585,16 @@ bool Riq::parseVar(char** buf)
         cout << hex << value << " - количество отсчетов в полосе" << endl;
         break;
      case DBI_VFMIN:
-        value = *((double *) *buf);
+//        value = *((double *) *buf);
+        printf("%lf - минимальная видимая граница частот\n", *((double *) *buf));
         *buf += 8;
-        cout << hex << value << " - минимальная видимая граница частот" << endl;
+//        cout << hex << value << " - минимальная видимая граница частот" << endl;
         break;
      case DBI_VFMAX:
-        value = *((double *) *buf);
+//        value = *((double *) *buf);
+        printf("%lf - максимальная видимая граница частот\n", *((double *) *buf));
         *buf += 8;
-        cout << hex << value << " - максимальная видимая граница частот" << endl;
+//        cout << hex << value << " - максимальная видимая граница частот" << endl;
         break;
      case DBI_AVGNUM:
         value = *((unsigned int *) *buf);
@@ -596,19 +612,22 @@ bool Riq::parseVar(char** buf)
         cout << hex << value << " - тип окна БПФ" << endl;
         break;
      case DBI_DBW:
-        value = *((double *) *buf);
+//        value = *((double *) *buf);
+        printf("%lf - ширина полосы демодуляции\n", *((double *) *buf));
         *buf += 8;
-        cout << hex << value << " - ширина полосы демодуляции" << endl;
+//        cout << hex << value << " - ширина полосы демодуляции" << endl;
         break;
      case DBI_VBW:
-        value = *((double *) *buf);
+//        value = *((double *) *buf);
+        printf("%lf - разрешение по частоте\n", *((double *) *buf));
         *buf += 8;
-        cout << hex << value << " - разрешение по частоте" << endl;
+//        cout << hex << value << " - разрешение по частоте" << endl;
         break;
      case DBI_BW:
-        value = *((double *) *buf);
+//        value = *((double *) *buf);
+        printf("%lf - ширина полосы\n", *((double *) *buf));
         *buf += 8;
-        cout << hex << value << " - ширина полосы" << endl;
+//        cout << hex << value << " - ширина полосы" << endl;
         break;
      case DBI_THRW:
 //        value = *((double *) *buf);
@@ -643,9 +662,10 @@ bool Riq::parseVar(char** buf)
         cout << hex << value << " - число проходов без превышения для неактивности" << endl;
         break;
      case DBI_SCALE:
-        value = *((double *) *buf);
+//        value = *((double *) *buf);
+        printf("%lf - масштаб по оси частот\n", *((double *) *buf));
         *buf += 8;
-        cout << hex << value << " - масштаб по оси частот" << endl;
+//        cout << hex << value << " - масштаб по оси частот" << endl;
         break;
      case DBI_SOD_SCALE:
         value = *((unsigned int *) *buf);
@@ -658,29 +678,34 @@ bool Riq::parseVar(char** buf)
         cout << hex << value << " - тип демодулятора" << endl;
         break;
      case DBI_DBANDWIDTH:
-        value = *((double *) *buf);
+//        value = *((double *) *buf);
+        printf("%lf - полоса демодулятора\n", *((double *) *buf));
         *buf += 8;
-        cout << hex << value << " - полоса демодулятора" << endl;
+//        cout << hex << value << " - полоса демодулятора" << endl;
         break;
      case DBI_YFMIN:
-        value = *((double *) *buf);
+//        value = *((double *) *buf);
+        printf("%lf - Нижняя граница спектра\n", *((double *) *buf));
         *buf += 8;
-        cout << hex << value << " - Нижняя граница спектра" << endl;
+//        cout << hex << value << " - Нижняя граница спектра" << endl;
         break;
      case DBI_YFMAX:
-        value = *((double *) *buf);
+//        value = *((double *) *buf);
+        printf("%lf - Верхняя граница спектра\n", *((double *) *buf));
         *buf += 8;
-        cout << hex << value << " - Верхняя граница спектра" << endl;
+//        cout << hex << value << " - Верхняя граница спектра" << endl;
         break;
      case DBI_TGRAM_MIN:
-        value = *((double *) *buf);
+//        value = *((double *) *buf);
+        printf("%lf - Нижняя граница топограмы\n", *((double *) *buf));
         *buf += 8;
-        cout << hex << value << " - Нижняя граница топограмы" << endl;
+//        cout << hex << value << " - Нижняя граница топограмы" << endl;
         break;
      case DBI_TGRAM_MAX:
-        value = *((double *) *buf);
+//        value = *((double *) *buf);
+        printf("%lf - Верхняя граница топограмы\n", *((double *) *buf));
         *buf += 8;
-        cout << hex << value << " - Верхняя граница топограмы" << endl;
+//        cout << hex << value << " - Верхняя граница топограмы" << endl;
         break;
      case DBI_TRACES:
         value = *((unsigned int *) *buf);
