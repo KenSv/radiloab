@@ -1,4 +1,5 @@
 #include <iostream>
+#include <math.h>
 #include "../db.h"
 #include "../include/Riq.h"
 
@@ -12,6 +13,57 @@ Riq::Riq()
 Riq::~Riq()
 {
     //dtor
+}
+
+void* Riq::getNextSpectr(char** buf)
+{
+    return *buf;
+}
+
+void Riq::fiterKalman(char** buf)
+{
+
+}
+
+void Riq::fiterBlackman(char** buf, const double in[], double out[], int sizeIn)
+{
+//    void Filter (const double in[], double out[], int sizeIn)
+    const int N = 20; //Длина фильтра
+    long double Fd = 2000; //Частота дискретизации входных данных
+    long double Fs = 20; //Частота полосы пропускания
+    long double Fx = 50; //Частота полосы затухания
+
+    long double H [N] = {0}; //Импульсная характеристика фильтра
+    long double H_id [N] = {0}; //Идеальная импульсная характеристика
+    long double W [N] = {0}; //Весовая функция
+
+    //Расчет импульсной характеристики фильтра
+    double Fc = (Fs + Fx) / (2 * Fd);
+
+    for (int i=0;i<N;i++)
+    {
+        if (i==0) H_id[i] = 2*M_PI*Fc;
+        else H_id[i] = sinl(2*M_PI*Fc*i )/(M_PI*i);
+        // весовая функция Блекмена
+        W [i] = 0.42 - 0.5 * cosl((2*M_PI*i) /( N-1)) + 0.08 * cosl((4*M_PI*i) /( N-1));
+        H [i] = H_id[i] * W[i];
+    }
+
+    //Нормировка импульсной характеристики
+    double SUM=0;
+    for (int i=0; i<N; i++) SUM +=H[i];
+    for (int i=0; i<N; i++) H[i]/=SUM; //сумма коэффициентов равна 1
+
+    //Фильтрация входных данных
+    for (int i=0; i<sizeIn; i++)
+    {
+        out[i]=0.;
+        for (int j=0; j<N-1; j++)// та самая формула фильтра
+        {
+            if(i-j>=0)
+            out[i]+= H[j]*in[i-j];
+        }
+    }
 }
 
 void Riq::dumpArray(char** buf, unsigned int bytes, unsigned int items, unsigned short itemsOnLine)
