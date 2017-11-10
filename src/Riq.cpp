@@ -95,7 +95,7 @@ void Riq::dumpTimeStamp(char** buf, const char* msg)
 {
 //    time_t tm = (time_t *) *buf;
 //    printf("%s: %s", msg, ctime(tm));
-    printf("%s: %s", msg, ctime((time_t *) *buf));
+    printf("%s: (%li) %s", msg, *((long *) *buf), ctime((time_t *) *buf));
     *buf += 8;
 }
 
