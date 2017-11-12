@@ -1,4 +1,4 @@
-fuelData = [70   63   61   62   64   68   55   60   64   59   45   55   57   14   52   52   35   52   65   62   36   17   49   69   65   42   38   59   61   47   48   55 ...
+ar = [70   63   61   62   64   68   55   60   64   59   45   55   57   14   52   52   35   52   65   62   36   17   49   69   65   42   38   59   61   47   48   55 ...
   41   40   53   36   33   52   69   68   44   54   56   29   51   54   50   18   37   67   79   72   70   57   43   39   29   60   70   67   54   55    5   60 ...
   63   21   29   56   54   60   70   59   62   75   61   49   66   62   63   67   60   61   60   55   73   82   81   69   74   71   52   55   44   60   64   55 ...
   49   73   75   65   56   65   47   56   82   83   50   69   73   65   44   53   70   67   32   66   74   70   64   50   27   65   76   76   76   75   77   81 ...
@@ -40,7 +40,8 @@ global double H; # factor of measured value to real value
 global double R; # environment noise
 global double State; #
 global double Covariance; #
-x = 1:1:1024;
+arSize = length(ar);
+x = 1:1:arSize;
 
 function KalmanFilterSimple1D(q, r, f = 1, h = 1)
   Q = q;
@@ -75,35 +76,33 @@ function Correct(data)
 endfunction;
 
 filtered = [];
-#print(fuelData(1));
+#print(ar(1));
 #var kalman = new KalmanFilterSimple1D(f: 1, h: 1, q: 2, r: 15); # задаем F, H, Q и R
-Q = 0.03;
+Q = 0.2;
 R = 0.8;
 F = 1;
 H = 1;
-y = exp(-fuelData/100);
+y = exp(-ar/100);
 #plot(y);
 State = y(1);
 Covariance = 0.1;
-#filtered = Correct(fuelData); # Применяем алгоритм
-for i = y
-  Correct(i); # Применяем алгоритм
-  filtered(end + 1) = State';
+#filtered = Correct(ar); # Применяем алгоритм
+#for i = y
+for i = 1:arSize
+  Correct(y(i)); # Применяем алгоритм
+#  filtered(end + 1) = State';
+  filtered(i) = State';
 #  printf("%10.4f %10.4f\n", i, State);
 endfor;
 #plot(y);
 #plot(filtered);
 
-filtered2 = [];
-for i = filtered
-  Correct(i); # Применяем алгоритм
-  filtered2(end + 1) = State';
-#  printf("%10.4f %10.4f\n", i, State);
+filtered2 = linspace(0, 0, arSize);
+#for i = filtered
+for i = 1:arSize
+  Correct(filtered(i)); # Применяем алгоритм
+  filtered2(i) = State';
 endfor;
-#plot(filtered2);
+plot(filtered2);
 
-plot(x, filtered2, '*', x, y, '.');
-
-#  kalman.Correct(d); # Применяем алгоритм
-#  filtered.Add(kalman.State); # Сохраняем текущее состояние
-
+#plot(x, filtered2, '*', x, y, '.');

@@ -44,7 +44,7 @@ middle = 0;
 arSize = length(ar); 
 koef = linspace(0, 0, arSize);
 
-#for n = 1:3
+for n = 1:2
 
 for i= 1:(arSize-1)
   delta = y(i+1) - y(i);
@@ -61,7 +61,7 @@ endfor
   for i= 2:arSize
     y(i) = y(i) * y(i) / dmax;
   endfor
-#endfor 
+endfor 
 
 
 #{

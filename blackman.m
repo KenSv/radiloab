@@ -89,5 +89,5 @@ for i= 0:(sizeIn-1)
 endfor
 
 x = 1:1:1024;
-plot(x, out, '*', x, in, '.');
-#plot(in);
+#plot(x, out, '*', x, in, '.');
+plot(out);
