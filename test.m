@@ -38,5 +38,50 @@ ar =  [70   63   61   62   64   68   55   60   64   59   45   55   57   14   52 
 #  y = ar[x];
 #  plot(x, y);
 y = exp(-ar/100);
+dmin = 1000;
+dmax = 0;
+middle = 0;
+arSize = length(ar); 
+koef = linspace(0, 0, arSize);
+
+#for n = 1:3
+
+for i= 1:(arSize-1)
+  delta = y(i+1) - y(i);
+  if (abs(delta) > dmax) 
+#    dmax = delta;
+    dmax = y(i+1);
+  endif  
+  if (abs(delta) < dmin) 
+    dmin = delta;  
+  endif  
+  koef(i+1) = delta;
+endfor
+
+  for i= 2:arSize
+    y(i) = y(i) * y(i) / dmax;
+  endfor
+#endfor 
+
+
+#{
+#for n = 1:2
+  for i= 2:arSize
+#    if (sign(koef(i)))
+#      y(i) = y(i-1) + abs(koef(i)) * (koef(i) / dmax);
+#      d = abs(koef(i)) * (koef(i) / dmax);
+      if (koef(i) < (dmax * 0.8))
+        y(i) = y(i-1) + abs(koef(i)) * (koef(i) / dmax);
+      endif  
+#      y(i) = y(i) - abs(koef(i)) * (koef(i) / dmax);
+#      y(i-1) = y(i-1) + abs(koef(i-1)) * (koef(i-1) / dmax);
+#      y(i) = y(i-1) + d;
+#      y(i-1) = y(i-1) - d;
+#    endif
+  endfor
+#endfor
+#}
+
+
 
 plot(y);
