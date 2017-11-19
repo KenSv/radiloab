@@ -147,11 +147,12 @@ ar = [71   64   74   75   60   38   51   65   64   58   66   78   81   74   76  
 %y = power(10, -ar/100);
 y = power(10, (ar * deltaM + deltaA)/10);
 plot(y);
+
 dmin = 1000;
 dmax = 0;
 middle = 0;
-arSize = length(ar); 
 koef = linspace(0, 0, arSize);
+
 
 for n = 1:2
     for i= 1:(arSize-1)
@@ -192,4 +193,4 @@ end
 
 
 
-plot(y);
+%plot(y);
