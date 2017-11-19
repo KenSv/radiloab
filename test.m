@@ -37,12 +37,17 @@ ar =  [70   63   61   62   64   68   55   60   64   59   45   55   57   14   52 
 #  x = linspace(0, 1023);
 #  y = ar[x];
 #  plot(x, y);
-y = exp(-ar/100);
+arSize = length(ar); 
+norm = 20.0*log10(arSize) - 30 + 17;
+y = power(10, (ar + norm)/10);
+#y = power(10., (ar)/10.);
+plot(y);
+#y = exp(-ar/100);
 dmin = 1000;
 dmax = 0;
 middle = 0;
-arSize = length(ar); 
 koef = linspace(0, 0, arSize);
+
 
 for n = 1:2
 
@@ -84,4 +89,4 @@ endfor
 
 
 
-plot(y);
+#plot(y);
