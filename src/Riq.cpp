@@ -20,6 +20,14 @@ void* Riq::getNextSpectr(char** buf)
     return *buf;
 }
 
+#ifdef KALMAN
+// реализация фильтра Калмана
+#elifdef BLACKMAN
+// реализация фильтра Блэкмана
+#elif
+// альтернативная реализация
+#endif
+
 void Riq::fiterKalman(char** buf)
 {
 /* пример на С#
