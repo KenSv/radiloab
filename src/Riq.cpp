@@ -15,7 +15,7 @@ Riq::~Riq()
     //dtor
 }
 
-void* Riq::getNextSpectr(char** buf)
+void* Riq::applyFilter(char* ptrIn, char* ptrOut, int size, long double gain, long double offset)
 {
     return *buf;
 }
@@ -187,6 +187,7 @@ bool Riq::parseArray(char** buf)
         cout << " спектр (_s16)" << endl;
         break;
     case DBI_FFT_U8:
+        applyFilter(char* ptrIn, char* ptrOut, int size, long double gain, long double offset);
         cout << " спектр (_u8)" << endl;
         break;
     case DBI_FFT_F64_2D:
