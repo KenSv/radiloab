@@ -113,8 +113,6 @@ int main(int argc, char* argv[])
     Riq riq;
 	while(readPtr < &buf[length]) {
 //        getType(&readPtr);
-
-//        cout << (unsigned int) (readPtr -buf) << " ";
         printf("%8x ", (unsigned int) (readPtr -buf));
         if(!riq.parseVar(&readPtr))
             riq.parseArray(&readPtr);

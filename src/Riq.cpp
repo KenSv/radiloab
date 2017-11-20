@@ -1,5 +1,6 @@
 #include <iostream>
 #include <math.h>
+#include <string>
 #include "../db.h"
 #include "../include/Riq.h"
 
@@ -15,73 +16,149 @@ Riq::~Riq()
     //dtor
 }
 
-void* Riq::applyFilter(char* ptrIn, char* ptrOut, int size, long double gain, long double offset)
+void Riq::applyFilter(char* ptrIn, char* ptrOut, int size, long double gain, long double offset)
 {
-    return *buf;
+
 }
 
-#ifdef KALMAN
-// реализация фильтра Калмана
-#elifdef BLACKMAN
-// реализация фильтра Блэкмана
-#elif
-// альтернативная реализация
-#endif
+//#ifdef KALMAN
+//// реализация фильтра Калмана
+//#elifdef BLACKMAN
+//// реализация фильтра Блэкмана
+//#elif
+//// альтернативная реализация
+//#endif
 
-void Riq::fiterKalman(char** buf)
+void fft_videofilter(_f64* S_in, _f64* S_out, int block_size, int blocks_num, int video_filter)
 {
-/* пример на С#
-       public double X0 {get; private set;} // predicted state
-        public double P0 { get; private set; } // predicted covariance
+//	int i;
+	_f64* vf_coeff;
+//	_f64 wnd_mean;
 
-        public double F { get; private set; } // factor of real value to previous real value
-        public double Q { get; private set; } // measurement noise
-        public double H { get; private set; } // factor of measured value to real value
-        public double R { get; private set; } // environment noise
+	if (video_filter > 1) {
+		// coefficients generation
+		video_filter |= 1; // must be odd
+//		vf_coeff = (_f64*)cp_mzalloc(video_filter*sizeof(_f64));
+		vf_coeff = (_f64*)malloc(video_filter*sizeof(_f64));
 
-        public double State { get; private set; }
-        public double Covariance { get; private set; }
+		// fill coefficients
+//		wnd_mean = 0;
+//		for (i = 0; i < (_s32)video_filter; i++){
+//			vf_coeff[i] = exp(-0.5*pow((i-(video_filter>>1))/0.3/(video_filter>>1),2));
+//			wnd_mean += vf_coeff[i];
+//		}
+//		for (i = 0; i < video_filter; i++) vf_coeff[i] /= wnd_mean;
+//
+//		while (blocks_num--) {
+//			vfilter_f64(S_in, block_size, vf_coeff, video_filter, S_out);
+//
+//			// increment pointers
+//			S_in += block_size;
+//			S_out += block_size;
+//		}
+//
+//		// free memory
+		if (vf_coeff) free(vf_coeff);
 
-        public KalmanFilterSimple1D(double q, double r, double f = 1, double h = 1)
-        {
-            Q = q;
-            R = r;
-            F = f;
-            H = h;
-        }
+	} else {
+//		cp_memcpy(S_out,S_in,block_size*blocks_num*sizeof(_f64));
+//		wmemcpy(S_out,S_in,block_size*blocks_num*sizeof(_f64));
+	}
+}
 
-        public void SetState(double state, double covariance)
-        {
-            State = state;
-            Covariance = covariance;
-        }
+void filterSimple(char** buf, int block_size)
+{
 
-        public void Correct(double data)
-        {
-            //time update - prediction
-            X0 = F*State;
-            P0 = F*Covariance*F + Q;
+    double dmax = 0;
+    double gain = 1;
+    double offset = 0;
+    int i;
+    _f64* pKoef;
+    _f64* pOut;
+    _u8* pIn;
+    pIn = (_u8*) *buf;
 
-            //measurement update - correction
-            var K = H*P0/(H*P0*H + R);
-            State = X0 + K*(data - H*X0);
-            Covariance = (1 - K*H)*P0;
-        }
+    pKoef   = (_f64*) malloc(block_size * sizeof(_f64));
+    pOut     = (_f64*) malloc(block_size * sizeof(_f64));
+
+    for (i=0; i < block_size; i++)
+    {
+        *pOut = pow(10, ((*pIn) * gain + offset)/10);
+        pOut += sizeof(_f64);
+        pIn  += sizeof(_u8);
     }
+
+//    for (i=0; i < block_size; i++)
+//    {
+//        delta = y(i+1) - y(i);
+//        if (abs(delta) > dmax) dmax = delta;
+//        koef(i+1) = delta;
+//    }
+//
+//    for (var i=1; i < block_size; i++)
+//    {
+//        y(i) = y(i) * y(i) / dmax;
+//    }
+
+    free(pKoef);
+    free(pOut);
+}
+
+
+
+void Riq::fiterKalman(char** buf, int block_size)
+{
+/*
+    double X0;  // predicted state
+    double P0;  // predicted covariance
+
+    double F;   // factor of real value to previous real value
+    double Q;   // measurement noise
+    double H;   // factor of measured value to real value
+    double R;   // environment noise
+
+    double State;
+    double Covariance;
+
+    KalmanFilterSimple1D(double q, double r, double f = 1, double h = 1)
+    {
+        Q = q;
+        R = r;
+        F = f;
+        H = h;
+    }
+
+    void SetState(double state, double covariance)
+    {
+        State = state;
+        Covariance = covariance;
+    }
+
+    void Correct(double data)
+    {
+        //time update - prediction
+        X0 = F*State;
+        P0 = F*Covariance*F + Q;
+
+        //measurement update - correction
+        var K = H*P0/(H*P0*H + R);
+        State = X0 + K*(data - H*X0);
+        Covariance = (1 - K*H)*P0;
+    }
+}
 */
 
 /*
     // Применение...
 
-    var fuelData = GetData();
+    var data = GetData();
     var filtered = new List<double>();
 
     var kalman = new KalmanFilterSimple1D(f: 1, h: 1, q: 2, r: 15); // задаем F, H, Q и R
-    kalman.SetState(fuelData[0], 0.1); // Задаем начальные значение State и Covariance
-    foreach(var d in fuelData)
+    kalman.SetState(data[0], 0.1); // Задаем начальные значение State и Covariance
+    foreach(var d in data)
     {
         kalman.Correct(d); // Применяем алгоритм
-
         filtered.Add(kalman.State); // Сохраняем текущее состояние
     }
 
@@ -92,14 +169,14 @@ void Riq::fiterKalman(char** buf)
 void Riq::fiterBlackman(char** buf, const double in[], double out[], int sizeIn)
 {
 //    void Filter (const double in[], double out[], int sizeIn)
-    const int N = 20; //Длина фильтра
-    long double Fd = 2000; //Частота дискретизации входных данных
-    long double Fs = 20; //Частота полосы пропускания
-    long double Fx = 50; //Частота полосы затухания
+    const int N = 20;           //Длина фильтра
+    double Fd   = 2000;      //Частота дискретизации входных данных
+    double Fs   = 20;        //Частота полосы пропускания
+    double Fx   = 50;        //Частота полосы затухания
 
-    long double H [N] = {0}; //Импульсная характеристика фильтра
-    long double H_id [N] = {0}; //Идеальная импульсная характеристика
-    long double W [N] = {0}; //Весовая функция
+    double H[N]     = {0};    //Импульсная характеристика фильтра
+    double H_id[N]  = {0}; //Идеальная импульсная характеристика
+    double W[N]     = {0};    //Весовая функция
 
     //Расчет импульсной характеристики фильтра
     double Fc = (Fs + Fx) / (2 * Fd);
@@ -195,7 +272,9 @@ bool Riq::parseArray(char** buf)
         cout << " спектр (_s16)" << endl;
         break;
     case DBI_FFT_U8:
-        applyFilter(char* ptrIn, char* ptrOut, int size, long double gain, long double offset);
+//        _u8* ptrOut = (_u8*)malloc(arItems * sizeof(_u8));
+//        applyFilter(*buf, ptrOut, arItems, 1, 0);
+//        free(ptrOut);
         cout << " спектр (_u8)" << endl;
         break;
     case DBI_FFT_F64_2D:

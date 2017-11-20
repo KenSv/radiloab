@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1509395337 source:/home/skn/mypro/cpp/radiolab/main.cpp
+1511210767 source:/home/skn/mypro/cpp/radiolab/main.cpp
 	<iostream>
 	<fstream>
 	<string.h>
@@ -24,7 +24,7 @@
 	"../db.h"
 	"../include/Riq.h"
 
-1509913743 /home/skn/mypro/cpp/radiolab/include/Riq.h
+1511213804 /home/skn/mypro/cpp/radiolab/include/Riq.h
 
 1509295006 /home/skn/mypro/cpp/radiloab/include/Riq.h
 
@@ -32,4 +32,9 @@
 	<iostream>
 	"../db.h"
 	"../include/Riq.h"
+
+1511205437 source:/home/skn/mypro/cpp/radiolab/src/Kalman.cpp
+	"Kalman.h"
+
+1511211067 /home/skn/mypro/cpp/radiolab/include/Kalman.h
 
