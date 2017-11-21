@@ -66,104 +66,93 @@ void fft_videofilter(_f64* S_in, _f64* S_out, int block_size, int blocks_num, in
 	}
 }
 
-void filterSimple(char** buf, int block_size)
-{
+//static void from_log(_f64* ones, _s32 size)
+//{
+//    for (_s32 i = 0; i < size; i++)
+//        ones[i] = pow(10., ones[i] / 10.);
+//}
+//
+//static void to_log(_f64* ones, _s32 size)
+//{
+//    for (_s32 i = 0; i < size; i++)
+//        ones[i] = 10.*log10(ones[i]);
+//}
 
+void filterSimple(_u8* pIn, _f64* pOut, int block_size)
+{
     double dmax = 0;
+    double delta = 0;
     double gain = 1;
     double offset = 0;
     int i;
     _f64* pKoef;
-    _f64* pOut;
-    _u8* pIn;
-    pIn = (_u8*) *buf;
+//    _f64* pOut;
+//    _u8* pIn;
+//    pIn = (_u8*) *buf;
 
     pKoef   = (_f64*) malloc(block_size * sizeof(_f64));
-    pOut     = (_f64*) malloc(block_size * sizeof(_f64));
+//    pOut     = (_f64*) malloc(block_size * sizeof(_f64));
 
     for (i=0; i < block_size; i++)
     {
-        *pOut = pow(10, ((*pIn) * gain + offset)/10);
-        pOut += sizeof(_f64);
-        pIn  += sizeof(_u8);
+        pOut[i] = pow(10, (pIn[i] * gain + offset)/10);
+        delta = pOut[i+1] - pOut[i];
+        if (abs(delta) > dmax) dmax = delta;
+        pKoef[i+1] = delta;
     }
 
-//    for (i=0; i < block_size; i++)
-//    {
-//        delta = y(i+1) - y(i);
-//        if (abs(delta) > dmax) dmax = delta;
-//        koef(i+1) = delta;
-//    }
-//
-//    for (var i=1; i < block_size; i++)
-//    {
-//        y(i) = y(i) * y(i) / dmax;
-//    }
+    for (i=1; i < block_size; i++)
+        pOut[i] = pOut[i] * pOut[i] / dmax;
+
+    for (i=0; i < block_size; i++)
+        pOut[i] = 10.*log10(pOut[i]);
 
     free(pKoef);
-    free(pOut);
+//    free(pOut);
 }
 
-
-
-void Riq::fiterKalman(char** buf, int block_size)
+void Riq::fiterKalman(_u8* pIn, _f64* pOut, int block_size)
 {
-/*
-    double X0;  // predicted state
-    double P0;  // predicted covariance
+    double gain = 1;
+    double offset = 0;
+//    _f64* pOut;
+//    _u8* pIn;
+//    pIn = (_u8*) *buf;
+//    pOut = (_f64*) malloc(block_size * sizeof(_f64));
 
-    double F;   // factor of real value to previous real value
-    double Q;   // measurement noise
-    double H;   // factor of measured value to real value
-    double R;   // environment noise
+    double ps;              // predicted state
+    double pc;              // predicted covariance
 
-    double State;
-    double Covariance;
+    double factor_r = 1;    // factor of real value to previous real value
+    double noise_m = 0.2;   // measurement noise
+    double factor_m = 1;    // factor of measured value to real value
+    double noise_env = 0.8; // environment noise
 
-    KalmanFilterSimple1D(double q, double r, double f = 1, double h = 1)
-    {
-        Q = q;
-        R = r;
-        F = f;
-        H = h;
-    }
+    double state;
+    double covariance;
+    double K;
+    int i;
 
-    void SetState(double state, double covariance)
-    {
-        State = state;
-        Covariance = covariance;
-    }
+    // Задаем начальные значение state и covariance
+    state = pOut[0];
+    covariance = 0.1;
+    // оставил в отдельном цикле, на случай применения рекурсивной обработки
+    for (i=0; i < block_size; i++)
+        pOut[i] = pow(10, (pIn[i] * gain + offset)/10);
 
-    void Correct(double data)
+    for (i=0; i< block_size; i++)
     {
         //time update - prediction
-        X0 = F*State;
-        P0 = F*Covariance*F + Q;
-
+        ps = factor_r*state;
+        pc = factor_r*covariance*factor_r + noise_m;
         //measurement update - correction
-        var K = H*P0/(H*P0*H + R);
-        State = X0 + K*(data - H*X0);
-        Covariance = (1 - K*H)*P0;
+        K = factor_m*pc/(factor_m*pc*factor_m + noise_env);
+        state = ps + K*(pOut[i] - factor_m*ps);
+        covariance = (1 - K*factor_m)*pc;
+        pOut[i] = state;
     }
-}
-*/
-
-/*
-    // Применение...
-
-    var data = GetData();
-    var filtered = new List<double>();
-
-    var kalman = new KalmanFilterSimple1D(f: 1, h: 1, q: 2, r: 15); // задаем F, H, Q и R
-    kalman.SetState(data[0], 0.1); // Задаем начальные значение State и Covariance
-    foreach(var d in data)
-    {
-        kalman.Correct(d); // Применяем алгоритм
-        filtered.Add(kalman.State); // Сохраняем текущее состояние
-    }
-
-*/
-
+    for (i=0; i < block_size; i++)
+        pOut[i] = 10.*log10(pOut[i]);
 }
 
 void Riq::fiterBlackman(char** buf, const double in[], double out[], int sizeIn)

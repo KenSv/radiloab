@@ -17,8 +17,8 @@ class Riq
 //        void* getNextSpectr(char** buf);
         void applyFilter(char* ptrIn, char* ptrOut, int size, long double gain, long double offset);
         void fiterBlackman(char** buf, const double in[], double out[], int sizeIn);
-        void fiterKalman(char** buf, int block_size);
-        void filterSimple(char** buf, int block_size);
+        void fiterKalman(_u8* pIn, _f64* pOut, int block_size);
+        void filterSimple(_u8* pIn, _f64* pOut, int block_size);
     protected:
     private:
         _f64 gain;
