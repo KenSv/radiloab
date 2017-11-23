@@ -19,14 +19,14 @@
 
 1508781276 /home/skn/mypro/cpp/radiloab/db.h
 
-1511295006 source:/home/skn/mypro/cpp/radiolab/src/Riq.cpp
+1511468668 source:/home/skn/mypro/cpp/radiolab/src/Riq.cpp
 	<iostream>
 	<math.h>
 	<string>
 	"../db.h"
 	"../include/Riq.h"
 
-1511295035 /home/skn/mypro/cpp/radiolab/include/Riq.h
+1511468819 /home/skn/mypro/cpp/radiolab/include/Riq.h
 
 1509295006 /home/skn/mypro/cpp/radiloab/include/Riq.h
 

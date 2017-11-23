@@ -78,7 +78,7 @@ void fft_videofilter(_f64* S_in, _f64* S_out, int block_size, int blocks_num, in
 //        ones[i] = 10.*log10(ones[i]);
 //}
 
-void filterSimple(_u8* pIn, _f64* pOut, int block_size)
+void Riq::filterSimple(_u8* pIn, _f64* pOut, int block_size)
 {
     double dmax = 0;
     double delta = 0;
@@ -94,8 +94,10 @@ void filterSimple(_u8* pIn, _f64* pOut, int block_size)
 //    pOut     = (_f64*) malloc(block_size * sizeof(_f64));
 
     for (i=0; i < block_size; i++)
-    {
         pOut[i] = pow(10, (pIn[i] * gain + offset)/10);
+
+    for (i=0; i < block_size; i++)
+    {
         delta = pOut[i+1] - pOut[i];
         if (abs(delta) > dmax) dmax = delta;
         pKoef[i+1] = delta;
@@ -223,8 +225,6 @@ void Riq::dumpArray(char** buf, unsigned int bytes, unsigned int items, unsigned
 
 void Riq::dumpTimeStamp(char** buf, const char* msg)
 {
-//    time_t tm = (time_t *) *buf;
-//    printf("%s: %s", msg, ctime(tm));
     printf("%s: (%li) %s", msg, *((long *) *buf), ctime((time_t *) *buf));
     *buf += 8;
 }
@@ -240,6 +240,8 @@ bool Riq::parseArray(char** buf)
 
 //    cout << arItems << " Массив ";
     printf(" Массив %u записей: ", arItems);
+    _f64* ptrOut = (_f64*)malloc(arItems * sizeof(_f64));
+
     switch (varType)
     {
     case DBI_IQDATA_S16:
@@ -261,9 +263,8 @@ bool Riq::parseArray(char** buf)
         cout << " спектр (_s16)" << endl;
         break;
     case DBI_FFT_U8:
-//        _u8* ptrOut = (_u8*)malloc(arItems * sizeof(_u8));
 //        applyFilter(*buf, ptrOut, arItems, 1, 0);
-//        free(ptrOut);
+        filterSimple(*buf, ptrOut, arItems);
         cout << " спектр (_u8)" << endl;
         break;
     case DBI_FFT_F64_2D:
@@ -354,6 +355,7 @@ bool Riq::parseArray(char** buf)
     default:
         break;
     }
+        free(ptrOut);
 
     dumpArray(buf, nb, arItems, 32);
     cout << "<<< Конец массива" << endl;
@@ -405,46 +407,32 @@ bool Riq::parseVar(char** buf)
         cout << hex << value << " - Идентификатор сканирования" << endl;
         break;
     case DBI_FMIN:
-//        value = *((double *) *buf);
         printf("%lf - Начальная частота (МГц)\n", *((double *) *buf));
         *buf += 8;
-//        cout << hex << value << " - Начальная частота (МГц)" << endl;
         break;
     case DBI_FMAX:
-//        value = *((double *) *buf);
         printf("%lf - Конечная частота (МГц)\n", *((double *) *buf));
         *buf += 8;
-//        cout << hex << value << " - Конечная частота (МГц)" << endl;
         break;
     case DBI_FCUR:
-//        value = *((double *) *buf);
         printf("%lf - Центральная частота (МГц)\n", *((double *) *buf));
         *buf += 8;
-//        cout << hex << value << " - Центральная частота (МГц)" << endl;
         break;
     case DBI_BAND:
-//        value = *((double *) *buf);
         printf("%lf - полоса (МГц)\n", *((double *) *buf));
        *buf += 8;
-//        cout << hex << value << " - полоса (МГц)" << endl;
         break;
     case DBI_GFMIN:
- //       value = *((double *) *buf);
         printf("%lf - общая начальная частота (МГц)\n", *((double *) *buf));
         *buf += 8;
-//        cout << hex << value << " - общая начальная частота (МГц)" << endl;
         break;
     case DBI_GFMAX:
-//        value = *((double *) *buf);
         printf("%lf - общая конечная частота (МГц)\n", *((double *) *buf));
         *buf += 8;
-//        cout << hex << value << " - общая конечная частота (МГц)" << endl;
         break;
     case DBI_FDIFF:
-//        value = *((double *) *buf);
         printf("%lf - отклонение частоты (МГц)\n", *((double *) *buf));
         *buf += 8;
-//        cout << hex << value << " - отклонение частоты (МГц)" << endl;
         break;
 
     case DBI_COUNT:
@@ -463,10 +451,8 @@ bool Riq::parseVar(char** buf)
         cout << hex << value << " - общее число отсчётов" << endl;
         break;
     case DBI_RBW_KHZ:
-//        value = *((unsigned short *) *buf);
         printf("%6u - rbw в кГц\n", *((unsigned short *) *buf));
         *buf += 2;
-//        cout << hex << value << " - rbw в кГц" << endl;
         break;
 
     case DBI_NPACK:
@@ -480,92 +466,61 @@ bool Riq::parseVar(char** buf)
         cout << hex << value << " - всего выборок в пачке" << endl;
         break;
     case DBI_PEAK_MAX:
-//        value = *((double *) *buf);
         printf("%lf - максимум пик-детектора\n", *((double *) *buf));
         *buf += 8;
-//        cout << hex << value << " - максимум пик-детектора" << endl;
         break;
     case DBI_PEAK_MEAN:
-//        value = *((double *) *buf);
         printf("%lf - среднее пик-детектора\n", *((double *) *buf));
         *buf += 8;
-//        cout << hex << value << " - среднее пик-детектора" << endl;
         break;
 
     case DBI_STIME:
-//        value = *((long *) *buf);
-//        printf("Время начала сканирования: %s", ctime((time_t *) *buf));
         dumpTimeStamp(buf, "Время начала сканирования");
-//        *buf += 8;
-//        cout << hex << value << " - время начала сканирования" << endl;
         break;
     case DBI_ETIME:
-//        value = *((long *) *buf);
         dumpTimeStamp(buf, "Время конца сканирования");
-//        printf("Время конца сканирования: %s", ctime((time_t *) *buf));
-//        *buf += 8;
-//        cout << hex << value << " - время конца сканирования" << endl;
         break;
     case DBI_CTIME:
-//        value = *((unsigned int *) *buf);
         printf("%ui - время получения выборки\n", *((unsigned int *) *buf));
         *buf += 4;
-//        cout << hex << value << " - время получения выборки" << endl;
         break;
 
     case DBI_INDEX:
-//        value = *((int *) *buf);
         printf("%i - номер выборки\n", *((int *) *buf));
         *buf += 4;
-//        cout << hex << value << " - номер выборки" << endl;
         break;
     case DBI_OFFSET:
-//        value = *((long *) *buf);
-        printf("%li - смещение выборки в файле\n", *((long *) *buf));
+        printf("%li - смещение выборки в файле\n", *((_s64 *) *buf));
         *buf += 8;
-//        cout << hex << value << " - смещение выборки в файле" << endl;
         break;
     case DBI_SIZE:
-        value = *((int *) *buf);
+        printf("%i - размер выборки в файле\n", *((_u32 *) *buf));
         *buf += 4;
-        cout << hex << value << " - размер выборки в файле" << endl;
         break;
 
      case DBI_DATA_GAIN:
-//        value = *((double *) *buf);
         printf("%lf - множитель для перевода FFT в _f64\n", *((double *) *buf));
         *buf += 8;
-//        cout << hex << value << " - множитель для перевода FFT в _f64" << endl;
         break;
      case DBI_DATA_OFFSET:
-//        value = *((double *) *buf);
         printf("%lf - смещение для перевода FFT в _f64\n", *((double *) *buf));
         *buf += 8;
-//        cout << hex << value << " - смещение для перевода FFT в _f64" << endl;
         break;
      case DBI_IQDATA_GAIN:
-//        value = *((double *) *buf);
         printf("%lf - множитель для перевода IQ в _f64\n", *((double *) *buf));
         *buf += 8;
-//        cout << hex << value << " - множитель для перевода IQ в _f64" << endl;
         break;
      case DBI_IQDATA_OFFSET:
-//        value = *((double *) *buf);
         printf("%lf - смещение для перевода IQ в _f64\n", *((double *) *buf));
         *buf += 8;
-//        cout << hex << value << " - смещение для перевода IQ в _f64" << endl;
         break;
      case DBI_ODATA_GAIN:
-//        value = *((double *) *buf);
         printf("%lf - множитель для перевода LF в _f64\n", *((double *) *buf));
         *buf += 8;
-//        cout << hex << value << " - множитель для перевода LF в _f64" << endl;
         break;
      case DBI_ODATA_OFFSET:
-//        value = *((double *) *buf);
         printf("%lf - смещение для перевода LF в _f64\n", *((double *) *buf));
         *buf += 8;
-//        cout << hex << value << " - смещение для перевода LF в _f64" << endl;
         break;
 
      case DBI_X:

@@ -1,8 +1,11 @@
 #ifndef RIQ_H
 #define RIQ_H
-typedef char _u8;
-typedef int32_t _s32;
-typedef double _f64;
+typedef char            _u8;
+typedef unsigned int    _u32;
+typedef int             _s32;
+typedef long            _s64;
+typedef double          _f64;
+
 
 
 class Riq
