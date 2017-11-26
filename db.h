@@ -58,7 +58,7 @@
 #define DBI_GFMAX			(0x00000015|DBIT_F64)	// обща€ конечна€ частота (ћ√ц)
 #define DBI_FDIFF			(0x00000016|DBIT_F64)	// отклонение частоты (ћ√ц)
 
-#define DBI_COUNT			(0x00000018|DBIT_S32)	// число выборок в данном сканировании
+#define DBI_COUNT			(0x00000018|DBIT_S32)	// число выборок в данном сканировании ??? skn число выборок со знаком ???
 #define DBI_SAMPLES			(0x00000019|DBIT_U32)	// число отсчЄтов в каждой выборке
 #define DBI_TOTAL_SAMPLES	(0x00000019|DBIT_U64)	// общее число отсчЄтов
 #define DBI_RBW_KHZ			(0x00000020|DBIT_U16)	// rbw в к√ц

@@ -116,18 +116,19 @@ int main(int argc, char* argv[])
         pRiq = (char*) malloc(sizeof(char)*length);
 //        in.read((char *) & str, sizeof(str_type));     // вариант с чтением структуры str_type
         char* readPtr = buf;
+        char* writePtr = pRiq;
 //	int ptr = 0;
-        Riq riq;
+//        Riq riq;
         fRiq = fopen("out_riq.riq", "w");
         while(readPtr < &buf[length]) {
 //        getType(&readPtr);
             printf("%8x ", (unsigned int) (readPtr -buf));
-            if(!riq.parseVar(&readPtr))
-                riq.parseArray(&readPtr);
+            if(!parseVar(&readPtr, &writePtr))
+                parseArray(&readPtr, &writePtr);
         }
 
         out.write(buf, length);
-        memcpy(pRiq, buf, length);
+//        memcpy(pRiq, buf, length);
         fwrite(pRiq, sizeof(char), length, fRiq);
 // жаль нет finally. Остаток кода нужно бы поместить туда :)
 // Если через класс, то уничтожать переменные/буферы в деструкторе ?

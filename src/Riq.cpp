@@ -1,25 +1,10 @@
 #include <iostream>
 #include <math.h>
-#include <string>
+#include <string.h>
 #include "../db.h"
 #include "../include/Riq.h"
 
 using namespace std;
-
-Riq::Riq()
-{
-    //ctor
-}
-
-Riq::~Riq()
-{
-    //dtor
-}
-
-void Riq::applyFilter(char* ptrIn, char* ptrOut, int size, long double gain, long double offset)
-{
-
-}
 
 //#ifdef KALMAN
 //// реализация фильтра Калмана
@@ -78,7 +63,7 @@ void fft_videofilter(_f64* S_in, _f64* S_out, int block_size, int blocks_num, in
 //        ones[i] = 10.*log10(ones[i]);
 //}
 
-void Riq::filterSimple(_u8* pIn, _f64* pOut, int block_size)
+void filterSimple(_u8* pIn, _f64* pOut, int block_size)
 {
     double dmax = 0;
     double delta = 0;
@@ -108,7 +93,7 @@ void Riq::filterSimple(_u8* pIn, _f64* pOut, int block_size)
     free(pKoef);
 }
 
-void Riq::fiterKalman(_u8* pIn, _f64* pOut, int block_size)
+void fiterKalman(_u8* pIn, _f64* pOut, int block_size)
 {
     double gain = 1;
     double offset = 0;
@@ -152,7 +137,7 @@ void Riq::fiterKalman(_u8* pIn, _f64* pOut, int block_size)
         pOut[i] = 10.*log10(pOut[i]);
 }
 
-void Riq::fiterBlackman(char** buf, const double in[], double out[], int sizeIn)
+void fiterBlackman(char** buf, const double in[], double out[], int sizeIn)
 {
 //    void Filter (const double in[], double out[], int sizeIn)
     const int N = 20;           //Длина фильтра
@@ -193,7 +178,7 @@ void Riq::fiterBlackman(char** buf, const double in[], double out[], int sizeIn)
     }
 }
 
-void Riq::dumpArray(char** buf, unsigned int bytes, unsigned int items, unsigned short itemsOnLine)
+void dumpArray(char** buf, unsigned int bytes, unsigned int items, unsigned short itemsOnLine)
 {
     for (unsigned int i=0; i < items; i++)
     {
@@ -214,138 +199,171 @@ void Riq::dumpArray(char** buf, unsigned int bytes, unsigned int items, unsigned
             default:
                 break;
         }
-        if ((i+1)%itemsOnLine == 0) cout << endl;
+        if ((i+1)%itemsOnLine == 0) printf("\n");
     }
 }
 
-void Riq::dumpTimeStamp(char** buf, const char* msg)
+void dumpTimeStamp(char** buf, const char* msg)
 {
     printf("%s: (%li) %s", msg, *((long *) *buf), ctime((time_t *) *buf));
     *buf += 8;
 }
 
-bool Riq::parseArray(char** buf)
+void dump_s32(char** buf, const char* msg)
+{
+    printf("%lf\t- %s\n", *((_s32 *) *buf), msg);
+    *buf += 4;
+}
+
+void dump_f64(char** buf, const char* msg)
+{
+    printf("%lf\t- %s\n", *((_f64 *) *buf), msg);
+    *buf += 8;
+}
+
+void dumpHex64(char** buf, const char* msg)
+{
+    printf("%16lx\t- %s\n", *((_u64 *) *buf), msg);
+    *buf += 8;
+}
+
+void dumpHex32(char** buf, const char* msg)
+{
+    printf("%8x\t- %s\n", *((_u32 *) *buf), msg);
+    *buf += 4;
+}
+
+void dumpHex8(char** buf, const char* msg)
+{
+    printf("%2x\t- %s\n", *((_u8 *) *buf), msg);
+    (*buf)++;
+}
+
+bool parseArray(char** buf, char** pRiq)
 {
     unsigned int varType = *((int *) *buf);
     unsigned int nb = (varType >> 24) & 0x0F;
     *buf += 4;
     unsigned int arItems = *((int *) *buf);
     *buf += 4; // длина массива следует за типом значения - 4 байта?
-//    value = arItems;
 
-//    cout << arItems << " Массив ";
+    memcpy(*pRiq, (*buf) - 8, arItems * nb + 8);
+
     printf(" Массив %u записей: ", arItems);
     _f64* ptrOut = (_f64*)malloc(arItems * sizeof(_f64));
 
     switch (varType)
     {
     case DBI_IQDATA_S16:
-        cout << " IQ-канал (_s16)" << endl;
+        printf(" IQ-канал (_s16)\n");
         break;
     case DBI_IQDATA_F64:
-        cout << " IQ-данные (_f64)" << endl;
+        printf(" IQ-данные (_f64)\n");
         break;
     case DBI_ODATA_S16:
-        cout << " осциллограф (_s16)" << endl;
+        printf(" осциллограф (_s16)\n");
         break;
     case DBI_ODATA_F64:
-        cout << " осциллограф (_f64)" << endl;
+        printf(" осциллограф (_f64)\n");
         break;
     case DBI_FFT_F64:
-        cout << " спектр (_f64)" << endl;
+        printf(" спектр (_f64)\n");
         break;
     case DBI_FFT_U16:
-        cout << " спектр (_s16)" << endl;
+        printf(" спектр (_s16)\n");
         break;
     case DBI_FFT_U8:
-//        applyFilter(*buf, ptrOut, arItems, 1, 0);
         filterSimple(*buf, ptrOut, arItems);
-        cout << " спектр (_u8)" << endl;
+        for (unsigned int i=0; i < arItems; i++)
+        {
+           (*pRiq)[i] = (_u8)((unsigned int) ptrOut[i]);
+        }
+        printf(" спектр (_u8)\n");
         break;
     case DBI_FFT_F64_2D:
-        cout << " 2D спектр (_f64)" << endl;
+        printf(" 2D спектр (_f64)\n");
         break;
     case DBI_TGRAM_F64:
-        cout << " 2D топограма (_f64)" << endl;
+        printf(" 2D топограма (_f64)\n");
         break;
     case DBI_BYTEARRAY:
-        cout << " массив данных" << endl;
+        printf(" массив данных\n");
         break;
     case DBI_DESC_S8:
-        cout << " описание" << endl;
+        printf(" описание\n");
         break;
     case DBI_DESC_U16:
-        cout << " описание" << endl;
+        printf(" описание\n");
         break;
     case DBI_FRAMES:
-        cout << " типы представления фреймов в каждом окне" << endl;
+        printf(" типы представления фреймов в каждом окне\n");
 //        cout << hex << buf << *buf << nb << arItems << endl;
         printf(/*"buf: %x *buf: %x*/ "nb: %i items: %i \n", nb, arItems);
         break;
     case DBI_MD_NAME:
-        cout << " имя мультимедиа файла" << endl;
+        printf(" имя мультимедиа файла\n");
         break;
     case DBI_CHAN_FFT:
-        cout << " канальный спектр" << endl;
+        printf(" канальный спектр\n");
         break;
     case DBI_SIGN_MASK:
-        cout << " маска сигнатуры" << endl;
+        printf(" маска сигнатуры\n");
         break;
     case DBI_NAME_S8:
-        cout << " имя" << endl;
+        printf(" имя\n");
         break;
     case DBI_NAME_U16:
-        cout << " " << endl;
+        printf(" \n");
         break;
     case DBI_GROUPNAME:
-        cout << " название под-группы эталона" << endl;
+        printf(" название под-группы эталона\n");
         break;
     case DBI_SUBGROUPNAME:
-        cout << " название под-группы эталона" << endl;
+        printf(" название под-группы эталона\n");
         break;
     case DBI_THRR_OFFSETS:
-        cout << " смещения порога записи" << endl;
+        printf(" смещения порога записи\n");
         break;
     case DBI_SPLITTERS:
-        cout << " разделители окна" << endl;
+        printf(" разделители окна\n");
         break;
     case DBI_CHAN_STATES:
-        cout << " состояния каналов" << endl;
+        printf(" состояния каналов\n");
         break;
 // пользователи
     case DBI_USER_LOGIN:
-        cout << " логин пользователя" << endl;
+        printf(" логин пользователя\n");
         break;
     case DBI_USER_NAME:
-        cout << " полное имя пользователя" << endl;
+        printf(" полное имя пользователя\n");
         break;
     case DBI_USER_AVATAR:
-        cout << " аватар пользователя" << endl;
+        printf(" аватар пользователя\n");
         break;
     case DBI_USER_PASSWD:
-        cout << " хеш пароля пользователя" << endl;
+        printf(" хеш пароля пользователя\n");
         break;
 
 // проекты
     case DBI_PROJ_NAME:
-        cout << " имя проекта" << endl;
+        printf(" имя проекта\n");
         break;
     case DBI_PROJ_PASSWD:
-        cout << " хеш пароля проекта" << endl;
+        printf(" хеш пароля проекта\n");
         break;
     case DBI_PROJ_DATA_DIR:
-        cout << " папка для сохранения файлов" << endl;
+        printf(" папка для сохранения файлов\n");
         break;
     case DBI_PROJ_OPTIONS:
-        cout << " опции проекта" << endl;
+        printf(" опции проекта\n");
         break;
 
 // приёмники
     case DBI_RCV_NAME:
-        cout << " имя приёмника" << endl;
+        printf(" имя приёмника\n");
         break;
     case DBI_RCV_CHN_NAME:
-        cout << " имя канала приёмника" << endl;
+        printf(" имя канала приёмника\n");
         break;
     default:
         break;
@@ -353,97 +371,125 @@ bool Riq::parseArray(char** buf)
         free(ptrOut);
 
     dumpArray(buf, nb, arItems, 32);
-    cout << "<<< Конец массива" << endl;
+    printf("<<< Конец массива\n");
+    *pRiq += (arItems * nb  + 8);
     *buf += arItems * nb;
     return true;
 }
 
-bool Riq::parseVar(char** buf)
+bool parseVar(char** buf, char** pRiq)
 {
     unsigned int varType = *((int *) *buf);
     if(varType & (DBIT_ARRAY|DBIT_ARRAY2|DBIT_ARRAY3)) return false;
+    unsigned int nb = (varType >> 24) & 0x0F;
+    memcpy(*pRiq, *buf, nb + 4);
+    *pRiq += (nb + 4);
     *buf += 4;
     long value;
     switch (varType)
     {
     case DBI_VERSION:
-        value = *((int *) *buf);
-        *buf += 4;
-        cout << hex << value << " - версия DB API" << endl;
+        dumpHex32(buf, "версия DB API");
+//        value = *((int *) *buf);
+//        *buf += 4;
+////        cout << hex << value << " - версия DB API" << endl;
+//        printf("%8lx - версия DB API\n", value);
         break;
     case DBI_SFLAGS:
-        value = *((unsigned int *) *buf);
-        *buf += 4;
-        cout << hex << value << " - системные флаги" << endl;
+        dumpHex32(buf, "системные флаги");
+//        value = *((unsigned int *) *buf);
+//        *buf += 4;
+//        printf("%8lx - системные флаги\n", value);
+////        cout << hex << value << " - системные флаги" << endl;
         break;
     case DBI_UFLAGS:
-        value = *((unsigned int *) *buf);
-        *buf += 4;
-        cout << hex << value << " - пользовательские флаги" << endl;
+        dumpHex32(buf, "пользовательские флаги");
+//        value = *((unsigned int *) *buf);
+//        *buf += 4;
+////        cout << hex << value << " - пользовательские флаги" << endl;
+//        printf("%8lx - пользовательские флаги\n", value);
         break;
     case DBI_UIN:
-        value = *((long *) *buf);
-        *buf += 8;
-        cout << hex << value << " - Уникальный номер" << endl;
+        dumpHex64(buf, "Уникальный номер");
+//        value = *((long *) *buf);
+//        *buf += 8;
+////        cout << hex << value << " - Уникальный номер" << endl;
+//        printf("%16lx - Уникальный номер\n", value);
         break;
     case DBI_UID:
-        value = *((long *) *buf);
-        *buf += 8;
-        cout << hex << value << " - Уникальный идентификатор" << endl;
+        dumpHex64(buf, "Уникальный идентификатор");
+//        value = *((long *) *buf);
+//        *buf += 8;
+////        cout << hex << value << " - Уникальный идентификатор" << endl;
+//        printf("%16lx - Уникальный идентификатор\n", value);
         break;
     case DBI_PROJECTID:
-        value = *((long *) *buf);
-        *buf += 8;
-        cout << hex << value << " - Уникальный идентификатор проекта" << endl;
+        dumpHex64(buf, "Уникальный идентификатор проекта");
+//        value = *((long *) *buf);
+//        *buf += 8;
+////        cout << hex << value << " - Уникальный идентификатор проекта" << endl;
+//        printf("%16lx - Уникальный идентификатор проекта\n", value);
         break;
     case DBI_SCANID:
-        value = *((unsigned int *) *buf);
-        *buf += 4;
-        cout << hex << value << " - Идентификатор сканирования" << endl;
+        dumpHex32(buf, "Идентификатор сканирования");
+//        value = *((unsigned int *) *buf);
+//        *buf += 4;
+////        cout << hex << value << " - Идентификатор сканирования" << endl;
+//        printf("%8lx - Идентификатор сканирования\n", value);
         break;
     case DBI_FMIN:
-        printf("%lf - Начальная частота (МГц)\n", *((double *) *buf));
-        *buf += 8;
+        dump_f64(buf, "Начальная частота (МГц)");
+//        printf("%lf - Начальная частота (МГц)\n", *((double *) *buf));
+//        *buf += 8;
         break;
     case DBI_FMAX:
-        printf("%lf - Конечная частота (МГц)\n", *((double *) *buf));
-        *buf += 8;
+        dump_f64(buf, "Конечная частота (МГц)");
+//        printf("%lf - Конечная частота (МГц)\n", *((double *) *buf));
+//        *buf += 8;
         break;
     case DBI_FCUR:
-        printf("%lf - Центральная частота (МГц)\n", *((double *) *buf));
-        *buf += 8;
+        dump_f64(buf, "Центральная частота (МГц)");
+//        printf("%lf - Центральная частота (МГц)\n", *((double *) *buf));
+//        *buf += 8;
         break;
     case DBI_BAND:
-        printf("%lf - полоса (МГц)\n", *((double *) *buf));
-       *buf += 8;
+        dump_f64(buf, "полоса (МГц)");
+//        printf("%lf - полоса (МГц)\n", *((double *) *buf));
+//       *buf += 8;
         break;
     case DBI_GFMIN:
-        printf("%lf - общая начальная частота (МГц)\n", *((double *) *buf));
-        *buf += 8;
+        dump_f64(buf, "общая начальная частота (МГц)");
+//        printf("%lf - общая начальная частота (МГц)\n", *((double *) *buf));
+//        *buf += 8;
         break;
     case DBI_GFMAX:
-        printf("%lf - общая конечная частота (МГц)\n", *((double *) *buf));
-        *buf += 8;
+        dump_f64(buf, "общая конечная частота (МГц)");
+//        printf("%lf - общая конечная частота (МГц)\n", *((double *) *buf));
+//        *buf += 8;
         break;
     case DBI_FDIFF:
-        printf("%lf - отклонение частоты (МГц)\n", *((double *) *buf));
-        *buf += 8;
+        dump_f64(buf, "отклонение частоты (МГц)");
+//        printf("%lf - отклонение частоты (МГц)\n", *((double *) *buf));
+//        *buf += 8;
         break;
 
     case DBI_COUNT:
         value = *((int *) *buf);
         *buf += 4;
-        cout << hex << value << " - число выборок в данном сканировании" << endl;
+//        cout << hex << value << " - число выборок в данном сканировании" << endl;
+        printf("%8lx - число выборок в данном сканировании\n", value);
         break;
     case DBI_SAMPLES:
         value = *((unsigned int *) *buf);
         *buf += 4;
-        cout << hex << value << " - число отсчётов в каждой выборке" << endl;
+//        cout << hex << value << " - число отсчётов в каждой выборке" << endl;
+        printf("%8lx - число отсчётов в каждой выборке\n", value);
         break;
     case DBI_TOTAL_SAMPLES:
         value = *((long *) *buf);
         *buf += 8;
-        cout << hex << value << " - общее число отсчётов" << endl;
+//        cout << hex << value << " - общее число отсчётов" << endl;
+        printf("%16lx - общее число отсчётов\n", value);
         break;
     case DBI_RBW_KHZ:
         printf("%6u - rbw в кГц\n", *((unsigned short *) *buf));
@@ -453,12 +499,14 @@ bool Riq::parseVar(char** buf)
     case DBI_NPACK:
         value = *((int *) *buf);
         *buf += 4;
-        cout << hex << value << " - номер выборки в пачке" << endl;
+//        cout << hex << value << " - номер выборки в пачке" << endl;
+        printf("%8lx - номер выборки в пачке\n", value);
         break;
     case DBI_NPACKS:
         value = *((int *) *buf);
         *buf += 4;
-        cout << hex << value << " - всего выборок в пачке" << endl;
+//        cout << hex << value << " - всего выборок в пачке" << endl;
+        printf("%8lx - всего выборок в пачке\n", value);
         break;
     case DBI_PEAK_MAX:
         printf("%lf - максимум пик-детектора\n", *((double *) *buf));
@@ -521,47 +569,56 @@ bool Riq::parseVar(char** buf)
      case DBI_X:
         value = *((int *) *buf);
         *buf += 4;
-        cout << hex << value << " - положение по горизонтали" << endl;
+//        cout << hex << value << " - положение по горизонтали" << endl;
+        printf("%8lx - положение по горизонтали\n", value);
         break;
      case DBI_Y:
         value = *((int *) *buf);
         *buf += 4;
-        cout << hex << value << " - положение по вертикали" << endl;
+//        cout << hex << value << " - положение по вертикали" << endl;
+        printf("%8lx - положение по вертикали\n", value);
         break;
      case DBI_CX:
         value = *((int *) *buf);
         *buf += 4;
-        cout << hex << value << " - размер по горизонтали" << endl;
+//        cout << hex << value << " - размер по горизонтали" << endl;
+        printf("%8lx - размер по горизонтали\n", value);
         break;
      case DBI_CY:
         value = *((int *) *buf);
         *buf += 4;
-        cout << hex << value << " - размер по вертикали" << endl;
+//        cout << hex << value << " - размер по вертикали" << endl;
+        printf("%8lx - размер по вертикали\n", value);
         break;
     case DBI_STYPE:
         value = *((unsigned char *) *buf);
         *buf += 1;
-        cout << hex << value << " - тип сигнала" << endl;
+//        cout << hex << value << " - тип сигнала" << endl;
+        printf("%8lx - тип сигнала\n", value);
         break;
     case DBI_MTYPE:
         value = *((unsigned char *) *buf);
         *buf += 1;
-        cout << hex << value << " - тип модуляции" << endl;
+//        cout << hex << value << " - тип модуляции" << endl;
+        printf("%2lx - тип модуляции\n", value);
         break;
      case DBI_ACOUNT:
         value = *((short *) *buf);
         *buf += 2;
-        cout << hex << value << " - счётчик активности" << endl;
+//        cout << hex << value << " - счётчик активности" << endl;
+        printf("%4lx - счётчик активности\n", value);
         break;
      case DBI_TCOUNT:
         value = *((unsigned int *) *buf);
         *buf += 4;
-        cout << hex << value << " - счётчик общего числа обнаружений" << endl;
+//        cout << hex << value << " - счётчик общего числа обнаружений" << endl;
+        printf("%8lx - счётчик общего числа обнаружений\n", value);
         break;
      case DBI_NRCV:
         value = *((int *) *buf);
         *buf += 4;
-        cout << hex << value << " - количество приёмников, на которых сигнал был найден" << endl;
+//        cout << hex << value << " - количество приёмников, на которых сигнал был найден" << endl;
+        printf("%8lx - количество приёмников, на которых сигнал был найден\n", value);
         break;
      case DBI_CHANNEL:
         value = *((unsigned short *) *buf);
