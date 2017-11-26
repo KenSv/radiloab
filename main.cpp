@@ -68,7 +68,8 @@ void getType(char** buf) {
         *buf += nb;
     }
     // << hex << (long) (*buf)
-    cout << "Тип: " << typeName << " Код типа: 0x" << hex << varType << " Значение: " << value << endl;
+//    cout << "Тип: " << typeName << " Код типа: 0x" << hex << varType << " Значение: " << value << endl;
+    printf("Тип: %s\t Код типа: %#08x\t Значение: %li\n", &typeName[0], varType, value);
 }
 
 int main(int argc, char* argv[])
@@ -78,54 +79,66 @@ int main(int argc, char* argv[])
     long int length;
     ifstream in;
     ofstream out;
+    FILE *fRiq;
+    char* pRiq;
     char *fname = new char [28];
-    cout << "Current path: " << getcwd(dirName, sizeof(dirName)) << endl;
+//    cout << "Current path: " << getcwd(dirName, sizeof(dirName)) << endl;
+    printf("Current path: %s\n", getcwd(dirName, sizeof(dirName)));
     if (argc > 1) {
         fname = argv[1];
     } else {
         strcpy(fname, "2017_09_13_12_54_32_333.riq");
     }
-    cout << "File name: " << fname << endl;
+//    cout << "File name: " << fname << endl;
+    printf("File name: %s\n", fname);
     in.open(fname, ios::in | ios::binary);
     out.open("out.riq", ios::out | ios::binary);
 
     if (!in) {
         length = in.tellg();
-        cout << "Error opening file ";
+        printf("Error opening file");
         exit(1);
     }
 
 // вариант с чтением/записью посредством буфера
     in.seekg(0, in.end);
     length = in.tellg();
-    cout << "File length: " << length << endl;
-    cout << "========================================" << endl;
-    cout << "  Адрес | Значение - Описание" << endl;
-    cout << "========================================" << endl;
+
+    printf("File length: %li\n", length);
+    printf("========================================\n");
+    printf("  Адрес | Значение - Описание\n");
+    printf("========================================\n");
 
     char *buf = new char [length];
     try {
         in.seekg(0);
         in.read((char *) buf, length);
+        pRiq = (char*) malloc(sizeof(char)*length);
 //        in.read((char *) & str, sizeof(str_type));     // вариант с чтением структуры str_type
-    char* readPtr = buf;
+        char* readPtr = buf;
 //	int ptr = 0;
-    Riq riq;
-	while(readPtr < &buf[length]) {
+        Riq riq;
+        fRiq = fopen("out_riq.riq", "w");
+        while(readPtr < &buf[length]) {
 //        getType(&readPtr);
-        printf("%8x ", (unsigned int) (readPtr -buf));
-        if(!riq.parseVar(&readPtr))
-            riq.parseArray(&readPtr);
-	}
+            printf("%8x ", (unsigned int) (readPtr -buf));
+            if(!riq.parseVar(&readPtr))
+                riq.parseArray(&readPtr);
+        }
 
         out.write(buf, length);
+        memcpy(pRiq, buf, length);
+        fwrite(pRiq, sizeof(char), length, fRiq);
 // жаль нет finally. Остаток кода нужно бы поместить туда :)
 // Если через класс, то уничтожать переменные/буферы в деструкторе ?
         delete [] buf;
         in.close();
         out.close();
+        fclose(fRiq);
+        free(pRiq);
     } catch (int e) {
-        cout << "An exception " << e <<" occurred\n";
+//        cout << "An exception " << e <<" occurred\n";
+        printf("An exception %i occurred\n", e);
         exit(2); // указать правильный код ошибки
     }
 

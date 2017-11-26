@@ -86,12 +86,8 @@ void Riq::filterSimple(_u8* pIn, _f64* pOut, int block_size)
     double offset = 0;
     int i;
     _f64* pKoef;
-//    _f64* pOut;
-//    _u8* pIn;
-//    pIn = (_u8*) *buf;
 
     pKoef   = (_f64*) malloc(block_size * sizeof(_f64));
-//    pOut     = (_f64*) malloc(block_size * sizeof(_f64));
 
     for (i=0; i < block_size; i++)
         pOut[i] = pow(10, (pIn[i] * gain + offset)/10);
@@ -110,7 +106,6 @@ void Riq::filterSimple(_u8* pIn, _f64* pOut, int block_size)
         pOut[i] = 10.*log10(pOut[i]);
 
     free(pKoef);
-//    free(pOut);
 }
 
 void Riq::fiterKalman(_u8* pIn, _f64* pOut, int block_size)
