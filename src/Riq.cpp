@@ -3,7 +3,6 @@
 #include <string.h>
 #include "../db.h"
 #include "../include/Riq.h"
-#include "../include/filters.h"
 
 
 using namespace std;
