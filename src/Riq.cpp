@@ -211,7 +211,7 @@ void dumpTimeStamp(char** buf, const char* msg)
 
 void dump_s32(char** buf, const char* msg)
 {
-    printf("%lf\t- %s\n", *((_s32 *) *buf), msg);
+    printf("%i\t- %s\n", *((_s32 *) *buf), msg);
     *buf += 4;
 }
 
