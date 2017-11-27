@@ -215,6 +215,24 @@ void dump_s32(char** buf, const char* msg)
     *buf += 4;
 }
 
+void dump_u32(char** buf, const char* msg)
+{
+    printf("%i\t- %s\n", *((_u32 *) *buf), msg);
+    *buf += 4;
+}
+
+void dump_u64(char** buf, const char* msg)
+{
+    printf("%li\t- %s\n", *((_u64 *) *buf), msg);
+    *buf += 8;
+}
+
+void dump_s64(char** buf, const char* msg)
+{
+    printf("%li\t- %s\n", *((_s64 *) *buf), msg);
+    *buf += 8;
+}
+
 void dump_f64(char** buf, const char* msg)
 {
     printf("%lf\t- %s\n", *((_f64 *) *buf), msg);
@@ -229,13 +247,13 @@ void dumpHex64(char** buf, const char* msg)
 
 void dumpHex32(char** buf, const char* msg)
 {
-    printf("%8x\t- %s\n", *((_u32 *) *buf), msg);
+    printf("%16x\t- %s\n", *((_u32 *) *buf), msg);
     *buf += 4;
 }
 
 void dumpHex8(char** buf, const char* msg)
 {
-    printf("%2x\t- %s\n", *((_u8 *) *buf), msg);
+    printf("%16x\t- %s\n", *((_u8 *) *buf), msg);
     (*buf)++;
 }
 
@@ -389,7 +407,8 @@ bool parseVar(char** buf, char** pRiq)
     switch (varType)
     {
     case DBI_VERSION:
-        dumpHex32(buf, "версия DB API");
+//        dumpHex32(buf, "версия DB API");
+        dump_u32(buf, "версия DB API");
 //        value = *((int *) *buf);
 //        *buf += 4;
 ////        cout << hex << value << " - версия DB API" << endl;
