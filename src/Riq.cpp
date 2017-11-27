@@ -3,180 +3,11 @@
 #include <string.h>
 #include "../db.h"
 #include "../include/Riq.h"
+#include "../include/filters.h"
+
 
 using namespace std;
 
-//#ifdef KALMAN
-//// реализация фильтра Калмана
-//#elifdef BLACKMAN
-//// реализация фильтра Блэкмана
-//#elif
-//// альтернативная реализация
-//#endif
-
-void fft_videofilter(_f64* S_in, _f64* S_out, int block_size, int blocks_num, int video_filter)
-{
-//	int i;
-	_f64* vf_coeff;
-//	_f64 wnd_mean;
-
-	if (video_filter > 1) {
-		// coefficients generation
-		video_filter |= 1; // must be odd
-//		vf_coeff = (_f64*)cp_mzalloc(video_filter*sizeof(_f64));
-		vf_coeff = (_f64*)malloc(video_filter*sizeof(_f64));
-
-		// fill coefficients
-//		wnd_mean = 0;
-//		for (i = 0; i < (_s32)video_filter; i++){
-//			vf_coeff[i] = exp(-0.5*pow((i-(video_filter>>1))/0.3/(video_filter>>1),2));
-//			wnd_mean += vf_coeff[i];
-//		}
-//		for (i = 0; i < video_filter; i++) vf_coeff[i] /= wnd_mean;
-//
-//		while (blocks_num--) {
-//			vfilter_f64(S_in, block_size, vf_coeff, video_filter, S_out);
-//
-//			// increment pointers
-//			S_in += block_size;
-//			S_out += block_size;
-//		}
-//
-//		// free memory
-		if (vf_coeff) free(vf_coeff);
-
-	} else {
-//		cp_memcpy(S_out,S_in,block_size*blocks_num*sizeof(_f64));
-//		wmemcpy(S_out,S_in,block_size*blocks_num*sizeof(_f64));
-	}
-}
-
-//static void from_log(_f64* ones, _s32 size)
-//{
-//    for (_s32 i = 0; i < size; i++)
-//        ones[i] = pow(10., ones[i] / 10.);
-//}
-//
-//static void to_log(_f64* ones, _s32 size)
-//{
-//    for (_s32 i = 0; i < size; i++)
-//        ones[i] = 10.*log10(ones[i]);
-//}
-
-void filterSimple(_u8* pIn, _f64* pOut, int block_size)
-{
-    double dmax = 0;
-    double delta = 0;
-    double gain = 1;
-    double offset = 0;
-    int i;
-    _f64* pKoef;
-
-    pKoef   = (_f64*) malloc(block_size * sizeof(_f64));
-
-    for (i=0; i < block_size; i++)
-        pOut[i] = pow(10, (pIn[i] * gain + offset)/10);
-
-    for (i=0; i < block_size; i++)
-    {
-        delta = pOut[i+1] - pOut[i];
-        if (abs(delta) > dmax) dmax = delta;
-        pKoef[i+1] = delta;
-    }
-
-    for (i=1; i < block_size; i++)
-        pOut[i] = pOut[i] * pOut[i] / dmax;
-
-    for (i=0; i < block_size; i++)
-        pOut[i] = 10.*log10(pOut[i]);
-
-    free(pKoef);
-}
-
-void fiterKalman(_u8* pIn, _f64* pOut, int block_size)
-{
-    double gain = 1;
-    double offset = 0;
-//    _f64* pOut;
-//    _u8* pIn;
-//    pIn = (_u8*) *buf;
-//    pOut = (_f64*) malloc(block_size * sizeof(_f64));
-
-    double ps;              // predicted state
-    double pc;              // predicted covariance
-
-    double factor_r = 1;    // factor of real value to previous real value
-    double noise_m = 0.2;   // measurement noise
-    double factor_m = 1;    // factor of measured value to real value
-    double noise_env = 0.8; // environment noise
-
-    double state;
-    double covariance;
-    double K;
-    int i;
-
-    // Задаем начальные значение state и covariance
-    state = pOut[0];
-    covariance = 0.1;
-    // оставил в отдельном цикле, на случай применения рекурсивной обработки
-    for (i=0; i < block_size; i++)
-        pOut[i] = pow(10, (pIn[i] * gain + offset)/10);
-
-    for (i=0; i< block_size; i++)
-    {
-        //time update - prediction
-        ps = factor_r*state;
-        pc = factor_r*covariance*factor_r + noise_m;
-        //measurement update - correction
-        K = factor_m*pc/(factor_m*pc*factor_m + noise_env);
-        state = ps + K*(pOut[i] - factor_m*ps);
-        covariance = (1 - K*factor_m)*pc;
-        pOut[i] = state;
-    }
-    for (i=0; i < block_size; i++)
-        pOut[i] = 10.*log10(pOut[i]);
-}
-
-void fiterBlackman(char** buf, const double in[], double out[], int sizeIn)
-{
-//    void Filter (const double in[], double out[], int sizeIn)
-    const int N = 20;           //Длина фильтра
-    double Fd   = 2000;      //Частота дискретизации входных данных
-    double Fs   = 20;        //Частота полосы пропускания
-    double Fx   = 50;        //Частота полосы затухания
-
-    double H[N]     = {0};    //Импульсная характеристика фильтра
-    double H_id[N]  = {0}; //Идеальная импульсная характеристика
-    double W[N]     = {0};    //Весовая функция
-
-    //Расчет импульсной характеристики фильтра
-    double Fc = (Fs + Fx) / (2 * Fd);
-
-    for (int i=0;i<N;i++)
-    {
-        if (i==0) H_id[i] = 2*M_PI*Fc;
-        else H_id[i] = sinl(2*M_PI*Fc*i )/(M_PI*i);
-        // весовая функция Блекмена
-        W [i] = 0.42 - 0.5 * cosl((2*M_PI*i) /( N-1)) + 0.08 * cosl((4*M_PI*i) /( N-1));
-        H [i] = H_id[i] * W[i];
-    }
-
-    //Нормировка импульсной характеристики
-    double SUM=0;
-    for (int i=0; i<N; i++) SUM +=H[i];
-    for (int i=0; i<N; i++) H[i]/=SUM; //сумма коэффициентов равна 1
-
-    //Фильтрация входных данных
-    for (int i=0; i<sizeIn; i++)
-    {
-        out[i]=0.;
-        for (int j=0; j<N-1; j++)// та самая формула фильтра
-        {
-            if(i-j>=0)
-            out[i]+= H[j]*in[i-j];
-        }
-    }
-}
 
 void dumpArray(char** buf, unsigned int bytes, unsigned int items, unsigned short itemsOnLine)
 {
@@ -211,7 +42,7 @@ void dumpTimeStamp(char** buf, const char* msg)
 
 void dump_s32(char** buf, const char* msg)
 {
-    printf("%lf\t- %s\n", *((_s32 *) *buf), msg);
+    printf("%i\t- %s\n", *((_s32 *) *buf), msg);
     *buf += 4;
 }
 
