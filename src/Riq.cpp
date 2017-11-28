@@ -4,8 +4,6 @@
 #include "../db.h"
 #include "../include/Riq.h"
 
-using namespace std;
-
 //#ifdef KALMAN
 //// реализация фильтра Калмана
 //#elifdef BLACKMAN
