@@ -37,12 +37,8 @@
 		</Compiler>
 		<Unit filename="db.h" />
 		<Unit filename="include/Riq.h" />
-		<Unit filename="include/filters.h" />
 		<Unit filename="main.cpp" />
 		<Unit filename="src/Riq.cpp" />
-		<Unit filename="src/filters.c">
-			<Option compilerVar="CC" />
-		</Unit>
 		<Extensions>
 			<code_completion />
 			<debugger />

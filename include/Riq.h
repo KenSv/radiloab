@@ -2,6 +2,8 @@
 #define RIQ_H
 typedef char            _u8;
 typedef signed char     _s8;
+typedef short           _s16;
+typedef unsigned short  _u16;
 typedef unsigned int    _u32;
 typedef int             _s32;
 typedef long            _s64;
