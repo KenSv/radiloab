@@ -31,9 +31,6 @@ void getType(char** buf) {
 
     typeName += ((varType & 0xC0000000)? "U": "S");
     unsigned int nb = (varType >> 24) & 0x0F;
-//    unsigned int id = varType & 0x000000FF;
-//    cout << "Id: " << id << " bytes: " << hex << nb <<endl;
-
     typeName +=  (nb == 1? "0": "\0") + to_string(nb << 3);
 
     *buf += 4;  // указатель на значение переменной
@@ -42,7 +39,6 @@ void getType(char** buf) {
     if (typeName[0] == 'A')
     {
         arItems = *((int *) *buf);
-//        cout << "array bytes: " << nb << endl;
         *buf += sizeof(int) + arItems * nb;  // длина массива следует за типом значения - 4 байта?
         value = arItems;
     }
@@ -67,8 +63,6 @@ void getType(char** buf) {
         }
         *buf += nb;
     }
-    // << hex << (long) (*buf)
-//    cout << "Тип: " << typeName << " Код типа: 0x" << hex << varType << " Значение: " << value << endl;
     printf("Тип: %s\t Код типа: %#08x\t Значение: %li\n", &typeName[0], varType, value);
 }
 
@@ -82,14 +76,12 @@ int main(int argc, char* argv[])
     FILE *fRiq;
     char* pRiq;
     char *fname = new char [28];
-//    cout << "Current path: " << getcwd(dirName, sizeof(dirName)) << endl;
     printf("Current path: %s\n", getcwd(dirName, sizeof(dirName)));
     if (argc > 1) {
         fname = argv[1];
     } else {
         strcpy(fname, "2017_09_13_12_54_32_333.riq");
     }
-//    cout << "File name: " << fname << endl;
     printf("File name: %s\n", fname);
     in.open(fname, ios::in | ios::binary);
     out.open("out.riq", ios::out | ios::binary);
@@ -138,7 +130,6 @@ int main(int argc, char* argv[])
         fclose(fRiq);
         free(pRiq);
     } catch (int e) {
-//        cout << "An exception " << e <<" occurred\n";
         printf("An exception %i occurred\n", e);
         exit(2); // указать правильный код ошибки
     }
