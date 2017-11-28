@@ -35,3 +35,10 @@ bin/*
 # datagramma
 *.riq
 *.layout
+
+#other
+*.dump
+*.txt
+*.ps
+*.pdf
+
