@@ -14,42 +14,6 @@ using namespace std;
 //// альтернативная реализация
 //#endif
 
-void fft_videofilter(_f64* S_in, _f64* S_out, int block_size, int blocks_num, int video_filter)
-{
-//	int i;
-	_f64* vf_coeff;
-//	_f64 wnd_mean;
-
-	if (video_filter > 1) {
-		// coefficients generation
-		video_filter |= 1; // must be odd
-//		vf_coeff = (_f64*)cp_mzalloc(video_filter*sizeof(_f64));
-		vf_coeff = (_f64*)malloc(video_filter*sizeof(_f64));
-
-		// fill coefficients
-//		wnd_mean = 0;
-//		for (i = 0; i < (_s32)video_filter; i++){
-//			vf_coeff[i] = exp(-0.5*pow((i-(video_filter>>1))/0.3/(video_filter>>1),2));
-//			wnd_mean += vf_coeff[i];
-//		}
-//		for (i = 0; i < video_filter; i++) vf_coeff[i] /= wnd_mean;
-//
-//		while (blocks_num--) {
-//			vfilter_f64(S_in, block_size, vf_coeff, video_filter, S_out);
-//
-//			// increment pointers
-//			S_in += block_size;
-//			S_out += block_size;
-//		}
-//
-//		// free memory
-		if (vf_coeff) free(vf_coeff);
-
-	} else {
-//		cp_memcpy(S_out,S_in,block_size*blocks_num*sizeof(_f64));
-//		wmemcpy(S_out,S_in,block_size*blocks_num*sizeof(_f64));
-	}
-}
 
 //static void from_log(_f64* ones, _s32 size)
 //{
