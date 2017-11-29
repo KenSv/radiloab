@@ -6,65 +6,14 @@
 
 using namespace std;
 
-//#ifdef KALMAN
-//// реализация фильтра Калмана
-//#elifdef BLACKMAN
-//// реализация фильтра Блэкмана
-//#elif
-//// альтернативная реализация
-//#endif
+//#define KALMAN
 
-
-//static void from_log(_f64* ones, _s32 size)
-//{
-//    for (_s32 i = 0; i < size; i++)
-//        ones[i] = pow(10., ones[i] / 10.);
-//}
-//
-//static void to_log(_f64* ones, _s32 size)
-//{
-//    for (_s32 i = 0; i < size; i++)
-//        ones[i] = 10.*log10(ones[i]);
-//}
-
-void filterSimple(_u8* pIn, _f64* pOut, int block_size)
-{
-    double dmax = 0;
-    double delta = 0;
-    double gain = 1;
-    double offset = 0;
-    int i;
-    _f64* pKoef;
-
-    pKoef   = (_f64*) malloc(block_size * sizeof(_f64));
-
-    for (i=0; i < block_size; i++)
-        pOut[i] = pow(10, (pIn[i] * gain + offset)/10);
-
-    for (i=0; i < block_size; i++)
-    {
-        delta = pOut[i+1] - pOut[i];
-        if (abs(delta) > dmax) dmax = delta;
-        pKoef[i+1] = delta;
-    }
-
-    for (i=1; i < block_size; i++)
-        pOut[i] = pOut[i] * pOut[i] / dmax;
-
-    for (i=0; i < block_size; i++)
-        pOut[i] = 10.*log10(pOut[i]);
-
-    free(pKoef);
-}
-
-void fiterKalman(_u8* pIn, _f64* pOut, int block_size)
+#ifdef KALMAN
+// Kalman filter
+void filter(_u8* pIn, _f64* pOut, int block_size)
 {
     double gain = 1;
     double offset = 0;
-//    _f64* pOut;
-//    _u8* pIn;
-//    pIn = (_u8*) *buf;
-//    pOut = (_f64*) malloc(block_size * sizeof(_f64));
 
     double ps;              // predicted state
     double pc;              // predicted covariance
@@ -100,6 +49,51 @@ void fiterKalman(_u8* pIn, _f64* pOut, int block_size)
     for (i=0; i < block_size; i++)
         pOut[i] = 10.*log10(pOut[i]);
 }
+#else
+// simple filter
+void filter(_u8* pIn, _f64* pOut, int block_size)
+{
+    double dmax = 0;
+    double delta = 0;
+    double gain = 1;
+    double offset = 0;
+    int i;
+    _f64* pKoef;
+
+    pKoef   = (_f64*) malloc(block_size * sizeof(_f64));
+
+    for (i=0; i < block_size; i++)
+        pOut[i] = pow(10, (pIn[i] * gain + offset)/10);
+
+    for (i=0; i < block_size; i++)
+    {
+        delta = pOut[i+1] - pOut[i];
+        if (abs(delta) > dmax) dmax = delta;
+        pKoef[i+1] = delta;
+    }
+
+    for (i=1; i < block_size; i++)
+        pOut[i] = pOut[i] * pOut[i] / dmax;
+
+    for (i=0; i < block_size; i++)
+        pOut[i] = 10.*log10(pOut[i]);
+
+    free(pKoef);
+}
+#endif
+
+
+//static void from_log(_f64* ones, _s32 size)
+//{
+//    for (_s32 i = 0; i < size; i++)
+//        ones[i] = pow(10., ones[i] / 10.);
+//}
+//
+//static void to_log(_f64* ones, _s32 size)
+//{
+//    for (_s32 i = 0; i < size; i++)
+//        ones[i] = 10.*log10(ones[i]);
+//}
 
 void fiterBlackman(char** buf, const double in[], double out[], int sizeIn)
 {
@@ -273,7 +267,7 @@ bool parseArray(char** buf, char** pRiq)
         printf(" спектр (_s16)\n");
         break;
     case DBI_FFT_U8:
-        filterSimple(*buf, ptrOut, arItems);
+        filter(*buf, ptrOut, arItems);
         for (unsigned int i=0; i < arItems; i++)
         {
            (*pRiq)[i] = (_u8)((unsigned int) ptrOut[i]);
