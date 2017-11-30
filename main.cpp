@@ -11,9 +11,7 @@ int main(int argc, char* argv[])
 {
     char dirName[1000];
     long int length;
-    ifstream in;
-    ofstream out;
-    FILE *fRiq;
+    FILE *fRiq, *fIn, *fOut;
     char* pRiq;
     char *fname = new char [30];
 
@@ -24,18 +22,19 @@ int main(int argc, char* argv[])
         strcpy(fname, "2017_09_13_12_54_32_333.riq");
     }
     printf("File name: %s\n", fname);
-    in.open(fname, ios::in | ios::binary);
-    out.open("origin.riq", ios::out | ios::binary);
-
-    if (!in) {
-        length = in.tellg();
-        printf("Error opening file");
+    try
+    {
+        fIn = fopen(fname, "rb");
+    }
+    catch (int e)
+    {
+        printf("Error opening file. Error %i", e);
+        fclose(fIn);
         exit(1);
     }
-
-// вариант с чтением/записью посредством буфера
-    in.seekg(0, in.end);
-    length = in.tellg();
+    fOut = fopen("origin.riq", "wb");
+    fseek(fIn, 0L, SEEK_END);
+    length = ftell(fIn);
 
     printf("File length: %li\n", length);
     printf("===========================================\n");
@@ -44,8 +43,8 @@ int main(int argc, char* argv[])
 
     char *buf = new char [length];
     try {
-        in.seekg(0);
-        in.read((char *) buf, length);
+        rewind(fIn);
+        fread((char *) buf, sizeof(char), length, fIn);
         pRiq = (char*) malloc(sizeof(char)*length);
         char* readPtr = buf;
         char* writePtr = pRiq;
@@ -56,20 +55,18 @@ int main(int argc, char* argv[])
             if(!parseVar(&readPtr, &writePtr))
                 parseArray(&readPtr, &writePtr);
         }
-
-        out.write(buf, length);
+        fwrite(buf, sizeof(char), length, fOut);
         fwrite(pRiq, sizeof(char), length, fRiq);
 
         delete [] buf;
-        in.close();
-        out.close();
+        fclose(fIn);
+        fclose(fOut);
         fclose(fRiq);
         free(pRiq);
     } catch (int e) {
         printf("An exception %i occurred\n", e);
         exit(1);
     }
-
    exit(0);
 }
 
