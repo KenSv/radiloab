@@ -11,22 +11,13 @@ typedef unsigned long   _u64;
 typedef double          _f64;
 
 
-//class Riq
-//{
-//    public:
-//        Riq();
-//        virtual ~Riq();
-        bool parseVar(char** buf, char** pRiq);
-        bool parseArray(char** buf, char** pRiq);
-        void dumpArray(char** buf, unsigned int bytes, unsigned int items, unsigned short itemsOnLine);
-        void dumpTimeStamp(char** buf, const char* msg);
-        void fiterBlackman(char** buf, const double in[], double out[], int sizeIn);
-        void fiterKalman(_u8* pIn, _f64* pOut, int block_size);
-        void filterSimple(_u8* pIn, _f64* pOut, int block_size);
-//    protected:
-//    private:
-//        _f64 gain;
-//        _f64 offset;
-//};
+
+bool parseVar(char** buf, char** pRiq);
+bool parseArray(char** buf, char** pRiq);
+void dumpArray(char** buf, unsigned int bytes, unsigned int items, unsigned short itemsOnLine);
+void dumpTimeStamp(char** buf, const char* msg);
+void fiterBlackman(char** buf, const double in[], double out[], int sizeIn);
+void fiterKalman(_u8* pIn, _f64* pOut, int block_size);
+void filterSimple(_u8* pIn, _f64* pOut, int block_size);
 
 #endif // RIQ_H
