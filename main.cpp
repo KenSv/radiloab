@@ -29,7 +29,7 @@ int main(int argc, char* argv[])
     catch (int e)
     {
         printf("Error opening file. Error %i", e);
-        fclose(fIn);
+//        fclose(fIn);
         exit(1);
     }
     fOut = fopen("origin.riq", "wb");

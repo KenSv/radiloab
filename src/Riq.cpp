@@ -58,9 +58,9 @@ void filter(_u8* pIn, _f64* pOut, int block_size)
     double gain = 1;
     double offset = 0;
     int i;
-    _f64* pKoef;
+//    _f64* pKoef;
 
-    pKoef   = (_f64*) malloc(block_size * sizeof(_f64));
+//    pKoef   = (_f64*) malloc(block_size * sizeof(_f64));
 
     for (i=0; i < block_size; i++)
         pOut[i] = pow(10, (pIn[i] * gain + offset)/10);
@@ -69,7 +69,7 @@ void filter(_u8* pIn, _f64* pOut, int block_size)
     {
         delta = pOut[i+1] - pOut[i];
         if (abs(delta) > dmax) dmax = delta;
-        pKoef[i+1] = delta;
+//        pKoef[i+1] = delta;
     }
 
     for (i=1; i < block_size; i++)
@@ -78,7 +78,7 @@ void filter(_u8* pIn, _f64* pOut, int block_size)
     for (i=0; i < block_size; i++)
         pOut[i] = 10.*log10(pOut[i]);
 
-    free(pKoef);
+//    free(pKoef);
 }
 #endif
 
