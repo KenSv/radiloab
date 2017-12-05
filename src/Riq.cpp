@@ -3,6 +3,11 @@
 #include <string.h>
 #include "../db.h"
 #include "../include/Riq.h"
+// for windows
+#include <stdlib.h>
+#include <stdio.h>
+#include <time.h>
+
 
 using namespace std;
 
