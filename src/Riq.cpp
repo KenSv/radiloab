@@ -53,32 +53,37 @@ void filter(_u8* pIn, _f64* pOut, int block_size)
 // simple filter
 void filter(_u8* pIn, _f64* pOut, int block_size)
 {
-    double dmax = 0;
+    double dmax, kmax = 0;
     double delta = 0;
     double gain = 1;
     double offset = 0;
     int i;
-    _f64* pKoef;
+//    _f64* pKoef;
 
-    pKoef   = (_f64*) malloc(block_size * sizeof(_f64));
+//    pKoef   = (_f64*) malloc(block_size * sizeof(_f64));
 
     for (i=0; i < block_size; i++)
         pOut[i] = pow(10, (pIn[i] * gain + offset)/10);
 
-    for (i=0; i < block_size; i++)
+    for (i=1; i < block_size; i++)
     {
-        delta = pOut[i+1] - pOut[i];
-        if (abs(delta) > dmax) dmax = delta;
-        pKoef[i+1] = delta;
+        delta = pOut[i] - pOut[i-1];
+        if (abs(delta) > dmax)
+        {
+            dmax = delta;
+            kmax = pOut[i];
+        }
+//        if (abs(delta) > dmax) dmax = pOut[i];
+//        pKoef[i] = delta;
     }
 
-    for (i=1; i < block_size; i++)
-        pOut[i] = pOut[i] * pOut[i] / dmax;
+    for (i=0; i < block_size; i++)
+        pOut[i] = 1+ pOut[i] * pOut[i] / kmax;
 
     for (i=0; i < block_size; i++)
         pOut[i] = 10.*log10(pOut[i]);
 
-    free(pKoef);
+//    free(pKoef);
 }
 #endif
 
@@ -95,7 +100,7 @@ void filter(_u8* pIn, _f64* pOut, int block_size)
 //        ones[i] = 10.*log10(ones[i]);
 //}
 
-void fiterBlackman(char** buf, const double in[], double out[], int sizeIn)
+void fiterBlackman(_u8** buf, const double in[], double out[], int sizeIn)
 {
 //    void Filter (const double in[], double out[], int sizeIn)
     const int N = 20;           //Длина фильтра
@@ -136,14 +141,14 @@ void fiterBlackman(char** buf, const double in[], double out[], int sizeIn)
     }
 }
 
-void dumpArray(char** buf, unsigned int bytes, unsigned int items, unsigned short itemsOnLine)
+void dumpArray(_u8** buf, unsigned int bytes, unsigned int items, unsigned short itemsOnLine)
 {
     for (unsigned int i=0; i < items; i++)
     {
         switch (bytes)
         {
             case 1:
-                printf("%4d ", *((char *) *buf + i*bytes));
+                printf("%4d ", *((unsigned char *) *buf + i*bytes));
                 break;
             case 2:
                 printf("%6d ", *((short *) *buf + i*bytes));
@@ -161,79 +166,79 @@ void dumpArray(char** buf, unsigned int bytes, unsigned int items, unsigned shor
     }
 }
 
-void dumpTimeStamp(char** buf, const char* msg)
+void dumpTimeStamp(_u8** buf, const char* msg)
 {
     printf("%s: (%li) %s", msg, *((long *) *buf), ctime((time_t *) *buf));
     *buf += 8;
 }
 
-void dump_u8(char** buf, const char* msg)
+void dump_u8(_u8** buf, const char* msg)
 {
     printf("%16ui\t- %s\n", *((_u8 *) *buf), msg);
     (*buf) ++;
 }
 
-void dump_s16(char** buf, const char* msg)
+void dump_s16(_u8** buf, const char* msg)
 {
     printf("%16ui\t- %s\n", *((_s16 *) *buf), msg);
     *buf += 2;
 }
 
-void dump_u16(char** buf, const char* msg)
+void dump_u16(_u8** buf, const char* msg)
 {
     printf("%16ui\t- %s\n", *((_u16 *) *buf), msg);
     *buf += 2;
 }
 
-void dump_s32(char** buf, const char* msg)
+void dump_s32(_u8** buf, const char* msg)
 {
     printf("%16i\t- %s\n", *((_s32 *) *buf), msg);
     *buf += 4;
 }
 
-void dump_u32(char** buf, const char* msg)
+void dump_u32(_u8** buf, const char* msg)
 {
     printf("%16i\t- %s\n", *((_u32 *) *buf), msg);
     *buf += 4;
 }
 
-void dump_u64(char** buf, const char* msg)
+void dump_u64(_u8** buf, const char* msg)
 {
     printf("%16li\t- %s\n", *((_u64 *) *buf), msg);
     *buf += 8;
 }
 
-void dump_s64(char** buf, const char* msg)
+void dump_s64(_u8** buf, const char* msg)
 {
     printf("%16li\t- %s\n", *((_s64 *) *buf), msg);
     *buf += 8;
 }
 
-void dump_f64(char** buf, const char* msg)
+void dump_f64(_u8** buf, const char* msg)
 {
     printf("%16lf\t- %s\n", *((_f64 *) *buf), msg);
     *buf += 8;
 }
 
-void dumpHex64(char** buf, const char* msg)
+void dumpHex64(_u8** buf, const char* msg)
 {
     printf("%16lx\t- %s\n", *((_u64 *) *buf), msg);
     *buf += 8;
 }
 
-void dumpHex32(char** buf, const char* msg)
+void dumpHex32(_u8** buf, const char* msg)
 {
     printf("%16x\t- %s\n", *((_u32 *) *buf), msg);
     *buf += 4;
 }
 
-void dumpHex8(char** buf, const char* msg)
+void dumpHex8(_u8** buf, const char* msg)
 {
     printf("%16x\t- %s\n", *((_u8 *) *buf), msg);
     (*buf)++;
 }
 
-bool parseArray(char** buf, char** pRiq)
+bool parseArray(_u8** buf, _u8** pRiq)
 {
     unsigned int varType = *((int *) *buf);
     unsigned int nb = (varType >> 24) & 0x0F;
@@ -242,6 +247,7 @@ bool parseArray(char** buf, char** pRiq)
     *buf += 4; // длина массива следует за типом значения - 4 байта?
 
     memcpy(*pRiq, (*buf) - 8, arItems * nb + 8);
+    *pRiq += 8;
 
     printf(" Массив %u записей: ", arItems);
     _f64* ptrOut = (_f64*)malloc(arItems * sizeof(_f64));
@@ -271,6 +277,7 @@ bool parseArray(char** buf, char** pRiq)
         for (unsigned int i=0; i < arItems; i++)
         {
            (*pRiq)[i] = (_u8)((unsigned int) ptrOut[i]);
+//           (*pRiq)[i] = (_u8) ptrOut[i];
         }
         printf(" спектр (_u8)\n");
         break;
@@ -365,12 +372,13 @@ bool parseArray(char** buf, char** pRiq)
 
     dumpArray(buf, nb, arItems, 32);
     printf("<<< Конец массива\n");
-    *pRiq += (arItems * nb  + 8);
+//    *pRiq += (arItems * nb  + 8);
+    *pRiq += arItems * nb;
     *buf += arItems * nb;
     return true;
 }
 
-bool parseVar(char** buf, char** pRiq)
+bool parseVar(_u8** buf, _u8** pRiq)
 {
     unsigned int varType = *((int *) *buf);
     if(varType & (DBIT_ARRAY|DBIT_ARRAY2|DBIT_ARRAY3)) return false;

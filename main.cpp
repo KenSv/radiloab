@@ -12,7 +12,7 @@ int main(int argc, char* argv[])
     char dirName[1000];
     long int length;
     FILE *fRiq, *fIn, *fOut;
-    char* pRiq;
+    _u8* pRiq;
     char *fname = new char [30];
 
     printf("Current path: %s\n", getcwd(dirName, sizeof(dirName)));
@@ -29,7 +29,7 @@ int main(int argc, char* argv[])
     catch (int e)
     {
         printf("Error opening file. Error %i", e);
-        fclose(fIn);
+//        fclose(fIn);
         exit(1);
     }
     fOut = fopen("origin.riq", "wb");
@@ -41,13 +41,13 @@ int main(int argc, char* argv[])
     printf("  Адрес |\tЗначение\tОписание\n");
     printf("===========================================\n");
 
-    char *buf = new char [length];
+    _u8 *buf = new _u8 [length];
     try {
         rewind(fIn);
         fread((char *) buf, sizeof(char), length, fIn);
-        pRiq = (char*) malloc(sizeof(char)*length);
-        char* readPtr = buf;
-        char* writePtr = pRiq;
+        pRiq = (_u8*) malloc(sizeof(_u8)*length);
+        _u8* readPtr = buf;
+        _u8* writePtr = pRiq;
 
         fRiq = fopen("filtered.riq", "w");
         while(readPtr < &buf[length]) {
