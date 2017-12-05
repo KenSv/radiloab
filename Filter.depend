@@ -1,10 +1,51 @@
 # depslib dependency file v1.0
-1508700973 source:/home/skn/mypro/cpp/radiolab/main.cpp
+1512475159 source:/home/skn/mypro/cpp/radiolab/main.cpp
 	<iostream>
 	<fstream>
 	<string.h>
 	<unistd.h>
 	"db.h"
+	"include/Riq.h"
 
-1507665915 /home/skn/mypro/cpp/radiolab/db.h
+1512463052 /home/skn/mypro/cpp/radiolab/db.h
+
+1511701756 source:/home/skn/mypro/cpp/radiloab/main.cpp
+	<iostream>
+	<fstream>
+	<string.h>
+	<unistd.h>
+	"db.h"
+	"include/Riq.h"
+
+1511723583 /home/skn/mypro/cpp/radiloab/db.h
+
+1512481166 source:/home/skn/mypro/cpp/radiolab/src/Riq.cpp
+	<iostream>
+	<math.h>
+	<string.h>
+	"../db.h"
+	"../include/Riq.h"
+
+1512475209 /home/skn/mypro/cpp/radiolab/include/Riq.h
+
+1511718124 /home/skn/mypro/cpp/radiloab/include/Riq.h
+
+1511723164 source:/home/skn/mypro/cpp/radiloab/src/Riq.cpp
+	<iostream>
+	<math.h>
+	<string.h>
+	"../db.h"
+	"../include/Riq.h"
+
+1511205437 source:/home/skn/mypro/cpp/radiolab/src/Kalman.cpp
+	"Kalman.h"
+
+1511211067 /home/skn/mypro/cpp/radiolab/include/Kalman.h
+
+1511700675 /home/skn/mypro/cpp/radiloab/src/Riq.cpp
+	<iostream>
+	<math.h>
+	<string.h>
+	"../db.h"
+	"../include/Riq.h"
 
