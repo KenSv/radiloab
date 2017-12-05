@@ -145,8 +145,12 @@ ar = [71   64   74   75   60   38   51   65   64   58   66   78   81   74   76  
 %y = exp(-ar/100);
 %y = exp(-(ar * deltaM + deltaA));
 %y = power(10, -ar/100);
-y = power(10, (ar * deltaM + deltaA)/10);
-plot(y);
+plot(ar);
+%y = power(10, (ar * deltaM + deltaA)/10);
+y = power(10, ar/10);
+
+arSize = length(ar);
+%plot(y);
 
 dmin = 1000;
 dmax = 0;
@@ -191,6 +195,6 @@ end
 %%endfor
 %}
 
-
+y = 10* log10(y);
 
 %plot(y);

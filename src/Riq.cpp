@@ -65,11 +65,11 @@ void filter(_u8* pIn, _f64* pOut, int block_size)
     for (i=0; i < block_size; i++)
         pOut[i] = pow(10, (pIn[i] * gain + offset)/10);
 
-    for (i=0; i < block_size; i++)
+    for (i=1; i < block_size; i++)
     {
-        delta = pOut[i+1] - pOut[i];
+        delta = pOut[i] - pOut[i-1];
         if (abs(delta) > dmax) dmax = delta;
-//        pKoef[i+1] = delta;
+//        pKoef[i] = delta;
     }
 
     for (i=1; i < block_size; i++)
@@ -242,6 +242,7 @@ bool parseArray(char** buf, char** pRiq)
     *buf += 4; // длина массива следует за типом значения - 4 байта?
 
     memcpy(*pRiq, (*buf) - 8, arItems * nb + 8);
+    *pRiq += 8;
 
     printf(" Массив %u записей: ", arItems);
     _f64* ptrOut = (_f64*)malloc(arItems * sizeof(_f64));
@@ -365,7 +366,7 @@ bool parseArray(char** buf, char** pRiq)
 
     dumpArray(buf, nb, arItems, 32);
     printf("<<< Конец массива\n");
-    *pRiq += (arItems * nb  + 8);
+    *pRiq += arItems * nb;
     *buf += arItems * nb;
     return true;
 }
