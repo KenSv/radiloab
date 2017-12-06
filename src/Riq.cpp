@@ -387,7 +387,7 @@ bool parseVar(_u8** buf, _u8** pRiq)
 {
     unsigned int varType = *((int *) *buf);
     if(varType & (DBIT_ARRAY|DBIT_ARRAY2|DBIT_ARRAY3)) return false;
-    unsigned int nb = (varType >> 24) & 0x0F;
+    unsigned int nb = (varType >> 24) & 0x0000000F;
     memcpy(*pRiq, *buf, nb + 4);
     *pRiq += (nb + 4);
     *buf += 4;
