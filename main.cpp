@@ -4,6 +4,11 @@
 #include <unistd.h>
 #include "db.h"
 #include "include/Riq.h"
+// for windows
+#include <cstdlib>
+#include <stdio.h>
+
+
 
 using namespace std;
 
