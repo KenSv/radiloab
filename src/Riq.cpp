@@ -58,8 +58,9 @@ void filter(_u8* pIn, _f64* pOut, int block_size)
 // simple filter
 void filter(_u8* pIn, _f64* pOut, int block_size)
 {
-    double dmax, kmax = 0;
-    double delta = 0;
+//    double dmax, kmax = 0;
+    double ymax;
+//    double delta = 0;
     double gain = 1;
     double offset = 0;
     int i;
@@ -70,20 +71,22 @@ void filter(_u8* pIn, _f64* pOut, int block_size)
     for (i=0; i < block_size; i++)
         pOut[i] = pow(10, (pIn[i] * gain + offset)/10);
 
+    ymax = pOut[0];
     for (i=1; i < block_size; i++)
     {
-        delta = pOut[i] - pOut[i-1];
-        if (abs(delta) > dmax)
-        {
-            dmax = delta;
-            kmax = pOut[i];
-        }
+//        delta = pOut[i] - pOut[i-1];
+//        if (abs(delta) > dmax)
+//        {
+//            dmax = delta;
+//            kmax = pOut[i];
+//        }
+        if (pOut[i] > ymax) ymax = pOut[i];
 //        if (abs(delta) > dmax) dmax = pOut[i];
 //        pKoef[i] = delta;
     }
 
     for (i=0; i < block_size; i++)
-        pOut[i] = 1+ pOut[i] * pOut[i] / kmax;
+        pOut[i] = 1+ pOut[i] * pOut[i] / ymax;
 
     for (i=0; i < block_size; i++)
         pOut[i] = 10.*log10(pOut[i]);
