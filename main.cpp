@@ -4,6 +4,11 @@
 #include <unistd.h>
 #include "db.h"
 #include "include/Riq.h"
+// for windows
+#include <cstdlib>
+#include <stdio.h>
+
+
 
 using namespace std;
 
@@ -49,14 +54,14 @@ int main(int argc, char* argv[])
         _u8* readPtr = buf;
         _u8* writePtr = pRiq;
 
-        fRiq = fopen("filtered.riq", "w");
+        fRiq = fopen("filtered.riq", "wb");
         while(readPtr < &buf[length]) {
-            printf("%8x ", (unsigned int) (readPtr -buf));
+            printf("%8x ", (unsigned int) (readPtr - buf));
             if(!parseVar(&readPtr, &writePtr))
                 parseArray(&readPtr, &writePtr);
         }
-        fwrite(buf, sizeof(char), length, fOut);
-        fwrite(pRiq, sizeof(char), length, fRiq);
+        fwrite(buf, sizeof(_u8), length, fOut);
+        fwrite(pRiq, sizeof(_u8), length, fRiq);
 
         delete [] buf;
         fclose(fIn);

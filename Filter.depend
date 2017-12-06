@@ -1,13 +1,15 @@
 # depslib dependency file v1.0
-1512475158 source:/home/skn/mypro/cpp/radiolab/main.cpp
+1512552095 source:/home/skn/mypro/cpp/radiolab/main.cpp
 	<iostream>
 	<fstream>
 	<string.h>
 	<unistd.h>
 	"db.h"
 	"include/Riq.h"
+	<cstdlib>
+	<stdio.h>
 
-1511724633 /home/skn/mypro/cpp/radiolab/db.h
+1512461764 /home/skn/mypro/cpp/radiolab/db.h
 
 1511894317 source:/home/skn/mypro/cpp/radiloab/main.cpp
 	<iostream>
@@ -19,14 +21,17 @@
 
 1511723583 /home/skn/mypro/cpp/radiloab/db.h
 
-1512485534 source:/home/skn/mypro/cpp/radiolab/src/Riq.cpp
+1512553744 source:/home/skn/mypro/cpp/radiolab/src/Riq.cpp
 	<iostream>
 	<math.h>
 	<string.h>
 	"../db.h"
 	"../include/Riq.h"
+	<stdlib.h>
+	<stdio.h>
+	<time.h>
 
-1512475208 /home/skn/mypro/cpp/radiolab/include/Riq.h
+1512461764 /home/skn/mypro/cpp/radiolab/include/Riq.h
 
 1511891669 /home/skn/mypro/cpp/radiloab/include/Riq.h
 
