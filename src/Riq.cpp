@@ -8,14 +8,12 @@
 #include <stdio.h>
 #include <time.h>
 
-
 using namespace std;
-
 //#define KALMAN
 
 #ifdef KALMAN
 // Kalman filter
-void filter(_u8* pIn, _f64* pOut, int block_size)
+void filter(_u8* pIn, _f64* pOut, int block_size, float percent = 100)
 {
     double gain = 1;
     double offset = 0;
@@ -56,7 +54,7 @@ void filter(_u8* pIn, _f64* pOut, int block_size)
 }
 #else
 // simple filter
-void filter(_u8* pIn, _f64* pOut, int block_size)
+void filter(_u8* pIn, _f64* pOut, int block_size, float percent = 100)
 {
 //    double dmax, kmax = 0;
     double ymax = 0, ymin = 10000000L;
@@ -87,26 +85,37 @@ void filter(_u8* pIn, _f64* pOut, int block_size)
 //        pKoef[i] = delta;
     }
 double k = 0.1;
-double mult;
+double mult, div;
     for (i=0; i < block_size; i++)
     {
-//        pOut[i] = 1+ pOut[i] * pOut[i] / ymax;
+        if (percent == 100)
+            pOut[i] = 1+ pOut[i] * pOut[i] / ymax;
 //        pOut[i] = 1+ pOut[i] * pOut[i] / ymax /k;
 //        pOut[i] = 1+ pOut[i] * pOut[i] / ymax/ (1 - (pOut[i] - ymax)/pow((ymin-ymax), 2));
 //        pOut[i] = 1+ pOut[i] * pOut[i] / ymax/ (1 - (percent/100) *(pOut[i] - ymax)/pow((ymin-ymax), 2));
 //        if (i == 0  )
 //        pOut[i] = 1 +   pOut[i] * pow((1 - pOut[i]/ymax), 2);
 
-        mult = pow(pOut[i], 2) * ((1 - k)/pow(ymax, 2)) + k;
-        if (i == 0 )
-            pOut[i] = 1 + pOut[i] * mult;
         else
-            if (pOut[i] > pOut[i-1])
-                pOut[i] = 1 + pOut[i] * mult;
-            else
-                pOut[i] = 1 + pOut[i] * (2 - mult);
-    }
+        {
+//            k = (100 - percent) / 100
+//            mult = pow(pOut[i], 2) * ((1 - k)/pow(ymax, 2)) + k;
+//            if (i == 0 )
+//                pOut[i] = 1 + pOut[i] * mult;
+//            else
+//                if (pOut[i] > pOut[i-1])
+//                    pOut[i] = 1 + pOut[i] * mult;
+//                else
+//                    pOut[i] = 1 + pOut[i] * (2 - mult);
+// =======================================================
 
+//            div = ymax-ymin * percent / 100 + 1;
+            if (ymin == 0) ymin = 1;
+            div = ((ymax - ymin) * 0.01) * percent / 100 + 1;
+            mult = (div - 1) * pow((ymax - pOut[i]), 2)/(ymax * ymax) + 1;
+            pOut[i] = 1 + pOut[i] / mult;
+        }
+    }
 
     for (i=0; i < block_size; i++)
         pOut[i] = 10.*log10(pOut[i]);
@@ -266,7 +275,7 @@ void dumpHex8(_u8** buf, const char* msg)
     (*buf)++;
 }
 
-bool parseArray(_u8** buf, _u8** pRiq)
+bool parseArray(_u8** buf, _u8** pRiq, float percent)
 {
     unsigned int varType = *((int *) *buf);
     unsigned int nb = (varType >> 24) & 0x0F;
@@ -301,7 +310,7 @@ bool parseArray(_u8** buf, _u8** pRiq)
         printf(" спектр (_s16)\n");
         break;
     case DBI_FFT_U8:
-        filter(*buf, ptrOut, arItems);
+        filter(*buf, ptrOut, arItems, percent);
         for (unsigned int i=0; i < arItems; i++)
         {
            (*pRiq)[i] = (_u8)((unsigned int) ptrOut[i]);
