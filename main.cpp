@@ -8,12 +8,13 @@
 #include <cstdlib>
 #include <stdio.h>
 
-
-
 using namespace std;
+
+
 
 int main(int argc, char* argv[])
 {
+    float percent = 1;
     char dirName[1000];
     long int length;
     FILE *fRiq, *fIn, *fOut;
@@ -21,10 +22,16 @@ int main(int argc, char* argv[])
     char *fname = new char [30];
 
     printf("Current path: %s\n", getcwd(dirName, sizeof(dirName)));
-    if (argc > 1) {
-        fname = argv[1];
-    } else {
-        strcpy(fname, "2017_09_13_12_54_32_333.riq");
+    switch (argc)
+    {
+        case 3:
+            percent = atof(argv[2]);
+        case 2:
+            fname = argv[1];
+            break;
+        default:
+            strcpy(fname, "2017_09_13_12_54_32_333.riq");
+            break;
     }
     printf("File name: %s\n", fname);
     try
@@ -58,7 +65,7 @@ int main(int argc, char* argv[])
         while(readPtr < &buf[length]) {
             printf("%8x ", (unsigned int) (readPtr - buf));
             if(!parseVar(&readPtr, &writePtr))
-                parseArray(&readPtr, &writePtr);
+                parseArray(&readPtr, &writePtr, percent);
         }
         fwrite(buf, sizeof(_u8), length, fOut);
         fwrite(pRiq, sizeof(_u8), length, fRiq);
