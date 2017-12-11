@@ -14,7 +14,7 @@ using namespace std;
 
 int main(int argc, char* argv[])
 {
-    float percent = 1;
+    float percent = 100;
     char dirName[1000];
     long int length;
     FILE *fRiq, *fIn, *fOut;
