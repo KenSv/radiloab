@@ -86,7 +86,7 @@ void filter(_u8* pIn, _f64* pOut, int block_size)
 //        if (abs(delta) > dmax) dmax = pOut[i];
 //        pKoef[i] = delta;
     }
-double k = 0.1;
+double k = 0.005;
 double mult;
     for (i=0; i < block_size; i++)
     {
@@ -98,13 +98,14 @@ double mult;
 //        pOut[i] = 1 +   pOut[i] * pow((1 - pOut[i]/ymax), 2);
 
         mult = pow(pOut[i], 2) * ((1 - k)/pow(ymax, 2)) + k;
-        if (i == 0 )
-            pOut[i] = 1 + pOut[i] * mult;
-        else
-            if (pOut[i] > pOut[i-1])
-                pOut[i] = 1 + pOut[i] * mult;
-            else
-                pOut[i] = 1 + pOut[i] * (2 - mult);
+pOut[i] = 1 + pOut[i] * mult;
+//        if (i == 0 )
+//            pOut[i] = 1 + pOut[i] * mult;
+//        else
+//            if (pOut[i] > pOut[i-1])
+//                pOut[i] = 1 + pOut[i] * mult;
+//            else
+//                pOut[i] = 1 + pOut[i] * (2 - mult);
     }
 
 
