@@ -57,9 +57,9 @@ void filter(_u8* pIn, _f64* pOut, int block_size, float percent = 100)
 void filter(_u8* pIn, _f64* pOut, int block_size, float percent = 100)
 {
 //    double dmax, kmax = 0;
-    double ymax = 0, ymin = 10000000L;
+    double ymax = 0, ymin = 10000000L, dmax = 0;
 //    double percent = 100;
-//    double delta = 0;
+    double delta = 0;
     double gain = 1;
     double offset = 0;
     int i;
@@ -72,20 +72,20 @@ void filter(_u8* pIn, _f64* pOut, int block_size, float percent = 100)
 
     ymax = pOut[0];
     for (i=1; i < block_size; i++)
-    {
-//        delta = pOut[i] - pOut[i-1];
-//        if (abs(delta) > dmax)
-//        {
-//            dmax = delta;
+        {
+        delta = pOut[i] - pOut[i-1];
+        if (abs(delta) > dmax)
+        {
+            dmax = delta;
 //            kmax = pOut[i];
-//        }
+        }
         if (pOut[i] > ymax) ymax = pOut[i];
         if (pOut[i] < ymin) ymin = pOut[i];
 //        if (abs(delta) > dmax) dmax = pOut[i];
 //        pKoef[i] = delta;
     }
 double k = 0.1;
-double mult, div;
+//double mult, div;
 //    for (i=0; i < block_size; i++)
 //    {
 //        if (percent == 100)
@@ -115,21 +115,29 @@ double mult, div;
 //            div = ((ymax - ymin) * 0.01) * percent / 100 + 1;
 //            mult = (div - 1) * pow((ymax - pOut[i]), 2)/(ymax * ymax) + 1;
 //            pOut[i] = 1 + pOut[i] / mult;
-//
-//
 //        }
 //    }
 // =======================================================
 // вариант со сглаживанием дельты
-    double delta, dc;
-    k = 1 - percent / 100;
-    for (i=1; i < block_size; i++)
+    double dc, kmin;
+//    double ppb, pnb, ppa, pna;
+//    kmin = 1 - percent / 100;
+    kmin = 0.1;
+//    k = (1 - kmin) / pow(ymax, 2);
+//    k = (1 - kmin) / dmax;
+    for (i = 1; i < block_size; i++)
     {
-        mult = pow(pOut[i], 2) * ((1 - k)/pow(ymax, 2)) + k;
+//        pnb = pOut[i];
+//        ppb = pOut[i-1];
+//        mult = k * pow(pOut[i], 2) + kmin;
         delta = pOut[i] - pOut[i-1];
-        dc = delta * mult / 2;
-        for (int n=0; i-1; n++) pOut[n] += dc;
-        for (int n=i; n; n++) pOut[n] -= dc;
+        k = 1 - ((delta * delta) * (1 - kmin) / (dmax * dmax)  + kmin);
+        k=0.01;
+        dc = delta * k /2;
+        for (int n = 0; n < i; n++) pOut[n] += dc;
+        for (int n = i; n < block_size; n++) pOut[n] -= dc;
+//        pna = pOut[i];
+//        ppa = pOut[i-1];
     }
 
     for (i=0; i < block_size; i++)
