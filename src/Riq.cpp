@@ -86,35 +86,50 @@ void filter(_u8* pIn, _f64* pOut, int block_size, float percent = 100)
     }
 double k = 0.1;
 double mult, div;
-    for (i=0; i < block_size; i++)
-    {
-        if (percent == 100)
-            pOut[i] = 1+ pOut[i] * pOut[i] / ymax;
-//        pOut[i] = 1+ pOut[i] * pOut[i] / ymax /k;
-//        pOut[i] = 1+ pOut[i] * pOut[i] / ymax/ (1 - (pOut[i] - ymax)/pow((ymin-ymax), 2));
-//        pOut[i] = 1+ pOut[i] * pOut[i] / ymax/ (1 - (percent/100) *(pOut[i] - ymax)/pow((ymin-ymax), 2));
-//        if (i == 0  )
-//        pOut[i] = 1 +   pOut[i] * pow((1 - pOut[i]/ymax), 2);
-
-        else
-        {
-//            k = (100 - percent) / 100
-//            mult = pow(pOut[i], 2) * ((1 - k)/pow(ymax, 2)) + k;
-//            if (i == 0 )
-//                pOut[i] = 1 + pOut[i] * mult;
-//            else
-//                if (pOut[i] > pOut[i-1])
-//                    pOut[i] = 1 + pOut[i] * mult;
-//                else
-//                    pOut[i] = 1 + pOut[i] * (2 - mult);
+//    for (i=0; i < block_size; i++)
+//    {
+//        if (percent == 100)
+//            pOut[i] = 1+ pOut[i] * pOut[i] / ymax;
+////        pOut[i] = 1+ pOut[i] * pOut[i] / ymax /k;
+////        pOut[i] = 1+ pOut[i] * pOut[i] / ymax/ (1 - (pOut[i] - ymax)/pow((ymin-ymax), 2));
+////        pOut[i] = 1+ pOut[i] * pOut[i] / ymax/ (1 - (percent/100) *(pOut[i] - ymax)/pow((ymin-ymax), 2));
+////        if (i == 0  )
+////        pOut[i] = 1 +   pOut[i] * pow((1 - pOut[i]/ymax), 2);
+//
+//        else
+//        {
+//// вариант с параболической функцией ослабления в диапазоне от 1(ymax) до 0
+////            k = (100 - percent) / 100
+////            mult = pow(pOut[i], 2) * ((1 - k)/pow(ymax, 2)) + k;
+////            if (i == 0 )
+////                pOut[i] = 1 + pOut[i] * mult;
+////            else
+////                if (pOut[i] > pOut[i-1])
+////                    pOut[i] = 1 + pOut[i] * mult;
+////                else
+////                    pOut[i] = 1 + pOut[i] * (2 - mult);
+//// =======================================================
+//// вариант с параболической функцией ослабления от 1(ymax) до бесконечности :)
+////            div = ymax-ymin * percent / 100 + 1;
+//            if (ymin == 0) ymin = 1;
+//            div = ((ymax - ymin) * 0.01) * percent / 100 + 1;
+//            mult = (div - 1) * pow((ymax - pOut[i]), 2)/(ymax * ymax) + 1;
+//            pOut[i] = 1 + pOut[i] / mult;
+//
+//
+//        }
+//    }
 // =======================================================
-
-//            div = ymax-ymin * percent / 100 + 1;
-            if (ymin == 0) ymin = 1;
-            div = ((ymax - ymin) * 0.01) * percent / 100 + 1;
-            mult = (div - 1) * pow((ymax - pOut[i]), 2)/(ymax * ymax) + 1;
-            pOut[i] = 1 + pOut[i] / mult;
-        }
+// вариант со сглаживанием дельты
+    double delta, dc;
+    k = 1 - percent / 100;
+    for (i=1; i < block_size; i++)
+    {
+        mult = pow(pOut[i], 2) * ((1 - k)/pow(ymax, 2)) + k;
+        delta = pOut[i] - pOut[i-1];
+        dc = delta * mult / 2;
+        for (int n=0; i-1; n++) pOut[n] += dc;
+        for (int n=i; n; n++) pOut[n] -= dc;
     }
 
     for (i=0; i < block_size; i++)
