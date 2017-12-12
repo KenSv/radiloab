@@ -132,10 +132,11 @@ double k = 0.1;
 //        mult = k * pow(pOut[i], 2) + kmin;
         delta = pOut[i] - pOut[i-1];
         k = 1 - ((delta * delta) * (1 - kmin) / (dmax * dmax)  + kmin);
-        k=0.01;
+        k=0.2;
         dc = delta * k /2;
-        for (int n = 0; n < i; n++) pOut[n] += dc;
-        for (int n = i; n < block_size; n++) pOut[n] -= dc;
+        pOut[i] -=dc;
+//        for (int n = 0; n < i; n++) pOut[n] += dc;
+//        for (int n = i; n < block_size; n++) pOut[n] -= dc;
 //        pna = pOut[i];
 //        ppa = pOut[i-1];
     }
