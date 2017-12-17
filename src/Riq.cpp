@@ -76,7 +76,7 @@ void filter(_u8* pIn, _f64* pOut, int block_size, float percent = 100)
         delta = pOut[i] - pOut[i-1];
         if (abs(delta) > dmax)
         {
-            dmax = delta;
+            dmax = abs(delta);
 //            kmax = pOut[i];
         }
         if (pOut[i] > ymax) ymax = pOut[i];
@@ -119,26 +119,21 @@ double k = 0.1;
 //    }
 // =======================================================
 // вариант со сглаживанием дельты
-    double dc, kmin;
-//    double ppb, pnb, ppa, pna;
-//    kmin = 1 - percent / 100;
-    kmin = 0.1;
-//    k = (1 - kmin) / pow(ymax, 2);
-//    k = (1 - kmin) / dmax;
+    long double dc, kmin, treshold;
+    kmin = 1 - percent / 100;
+    treshold = dmax / 1E15;  // значение 1E15 по физическому смыслу - соотношение сигнал/шум
     for (i = 1; i < block_size; i++)
     {
-//        pnb = pOut[i];
-//        ppb = pOut[i-1];
-//        mult = k * pow(pOut[i], 2) + kmin;
         delta = pOut[i] - pOut[i-1];
-        k = 1 - ((delta * delta) * (1 - kmin) / (dmax * dmax)  + kmin);
-        k=0.2;
-        dc = delta * k /2;
+        if (abs(delta) > treshold) continue;
+        k = 1 - (pow(delta/dmax, 2) * (1 - kmin) + kmin);
+        dc = delta * k;
         pOut[i] -=dc;
+//        dc = delta * k /2;
+//        pOut[i-1] += dc;
+//        pOut[i] -= dc;
 //        for (int n = 0; n < i; n++) pOut[n] += dc;
 //        for (int n = i; n < block_size; n++) pOut[n] -= dc;
-//        pna = pOut[i];
-//        ppa = pOut[i-1];
     }
 
     for (i=0; i < block_size; i++)
