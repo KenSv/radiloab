@@ -117,24 +117,75 @@ double k = 0.1;
 //            pOut[i] = 1 + pOut[i] / mult;
 //        }
 //    }
+
 // =======================================================
 // вариант со сглаживанием дельты
     long double dc, kmin, treshold;
+percent = 98;
     kmin = 1 - percent / 100;
     treshold = dmax / 1E15;  // значение 1E15 по физическому смыслу - соотношение сигнал/шум
     for (i = 1; i < block_size; i++)
     {
         delta = pOut[i] - pOut[i-1];
-        if (fabs(delta) > treshold) continue;
+//        if (fabs(delta) > treshold) continue;
         k = 1 - (pow(delta/dmax, 2) * (1 - kmin) + kmin);
-        dc = delta * k;
-        pOut[i] -=dc;
-//        dc = delta * k /2;
-//        pOut[i-1] += dc;
-//        pOut[i] -= dc;
-//        for (int n = 0; n < i; n++) pOut[n] += dc;
-//        for (int n = i; n < block_size; n++) pOut[n] -= dc;
+//        dc = delta * k;
+//        pOut[i] -=dc;
+
+        dc = delta * k /2;
+//        dc = delta/2;
+        pOut[i-1] += dc;
+        pOut[i] -= dc;
+        for (int n = 0; n < i; n++) pOut[n] += dc;
+        for (int n = i; n < block_size; n++) pOut[n] -= dc;
     }
+
+//// =======================================================
+//// вариант со сглаживанием дельты в два прохода в прямом и обратном направлении
+//    long double dc, kmin, treshold;
+//    _f64* pOlr;
+//    _f64* pOrl;
+//    pOlr  = (_f64*) malloc(block_size * sizeof(_f64));
+//    pOrl  = (_f64*) malloc(block_size * sizeof(_f64));
+//percent = 90;
+//    kmin = 1 - percent / 100;
+//    treshold = dmax / 1E15;  // значение 1E15 по физическому смыслу - соотношение сигнал/шум
+//    for (i = 1; i < block_size; i++)
+//    {
+//        delta = pOut[i] - pOut[i-1];
+//        if (fabs(delta) > treshold)
+//        {
+//            pOlr[i] = pOut[i];
+//            continue;
+//        }
+//        k = 1 - (pow(delta/dmax, 2) * (1 - kmin) + kmin);
+//        dc = delta * k;
+//        pOlr[i] = pOut[i] - dc;
+//    }
+//    pOlr[0] = pOut[0];
+//    for (i = block_size-2; i >= 0; i--)
+//    {
+//        delta = pOut[i] - pOut[i+1];
+//        if (fabs(delta) > treshold)
+//        {
+//            pOrl[i] = pOut[i];
+//            continue;
+//        }
+//        k = 1 - (pow(delta/dmax, 2) * (1 - kmin) + kmin);
+//        dc = delta * k;
+//        pOrl[i] = pOut[i] - dc;
+//    }
+//    pOrl[block_size-1] = pOut[block_size-1];
+//    for (i = 0; i < block_size; i++)
+//    {
+//        pOut[i] = (pOlr[i] + pOrl[i]) /2;
+////        pOut[i] = pOrl[i];
+////        pOut[i] = pOlr[i];
+//    }
+//    free(pOlr);
+//    free(pOrl);
+//// =======================================================
+
 
     for (i=0; i < block_size; i++)
         pOut[i] = 10.*log10(pOut[i]);
