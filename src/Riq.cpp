@@ -118,27 +118,28 @@ double k = 0.1;
 //        }
 //    }
 
-//// =======================================================
-//// вариант со сглаживанием дельты
-//    long double dc, kmin, treshold;
-//percent = 98;
-//    kmin = 1 - percent / 100;
-//    treshold = dmax / 1E15;  // значение 1E15 по физическому смыслу - соотношение сигнал/шум
-//    for (i = 1; i < block_size; i++)
-//    {
-//        delta = pOut[i] - pOut[i-1];
-////        if (fabs(delta) > treshold) continue;
-//        k = 1 - (pow(delta/dmax, 2) * (1 - kmin) + kmin);
-////        dc = delta * k;
-////        pOut[i] -=dc;
-//
-//        dc = delta * k /2;
-////        dc = delta/2;
-//        pOut[i-1] += dc;
-//        pOut[i] -= dc;
-////        for (int n = 0; n < i; n++) pOut[n] += dc;
-////        for (int n = i; n < block_size; n++) pOut[n] -= dc;
-//    }
+// =======================================================
+// вариант со сглаживанием дельты с двумя проходами в разных направлениях
+    long double dc, kmin, treshold;
+//percent = 90;
+    kmin = 1 - percent / 100;
+    treshold = dmax / 1E15;  // значение 1E15 по физическому смыслу - соотношение сигнал/шум
+    for (i = 1; i < block_size; i++)
+    {
+        delta = pOut[i] - pOut[i-1];
+        if (fabs(delta) > treshold) continue;
+        k = 1 - (pow(delta/dmax, 2) * (1 - kmin) + kmin);
+        dc = delta * k/2;
+        pOut[i] -=dc;
+    }
+    for (i = block_size - 2; i >= 0; i--)
+    {
+        delta = pOut[i] - pOut[i+1];
+        if (fabs(delta) > treshold) continue;
+        k = 1 - (pow(delta/dmax, 2) * (1 - kmin) + kmin);
+        dc = delta * k;
+        pOut[i] -=dc;
+    }
 
 //// =======================================================
 //// вариант со сглаживанием дельты по трем точкам (triangle)
@@ -155,23 +156,23 @@ double k = 0.1;
 //        pOut[i] -=dc;
 //    }
 
-// =======================================================
-// подвариант со сглаживанием дельты по трем точкам (triangle) только по пикам
-    long double dc, kmin, treshold;
-percent = 98;
-    kmin = 1 - percent / 100;
-    treshold = dmax / 1E15;  // значение 1E15 по физическому смыслу - соотношение сигнал/шум
-    for (i = 1; i < block_size - 1; i++)
-    {
-        if ((pOut[i] > pOut[i-1] && pOut[i] > pOut[i+1]) || (pOut[i] < pOut[i-1] && pOut[i] < pOut[i+1]))
-        {
-            delta = pOut[i] - (pOut[i+1] + pOut[i-1]) / 2;
-            if (fabs(delta) > treshold) continue;
-            k = 1 - (pow(delta/dmax, 2) * (1 - kmin) + kmin);
-            dc = delta * k;
-            pOut[i] -=dc;
-        }
-    }
+//// =======================================================
+//// подвариант со сглаживанием дельты по трем точкам (triangle) только по пикам
+//    long double dc, kmin, treshold;
+//percent = 98;
+//    kmin = 1 - percent / 100;
+//    treshold = dmax / 1E15;  // значение 1E15 по физическому смыслу - соотношение сигнал/шум
+//    for (i = 1; i < block_size - 1; i++)
+//    {
+//        if ((pOut[i] > pOut[i-1] && pOut[i] > pOut[i+1]) || (pOut[i] < pOut[i-1] && pOut[i] < pOut[i+1]))
+//        {
+//            delta = pOut[i] - (pOut[i+1] + pOut[i-1]) / 2;
+//            if (fabs(delta) > treshold) continue;
+//            k = 1 - (pow(delta/dmax, 2) * (1 - kmin) + kmin);
+//            dc = delta * k;
+//            pOut[i] -=dc;
+//        }
+//    }
 
 //// =======================================================
 //// вариант со сглаживанием дельты в два прохода в прямом и обратном направлении
