@@ -147,35 +147,70 @@ void filter(_u8* pIn, _f64* pOut, int block_size, float percent = 100)
     _f64* pTmp;
     pTmp  = (_f64*) malloc(block_size * sizeof(_f64));
 //    int frame_size = 11;
-    int frame_size = round(block_size*0.1);
+    int frame_size = round(block_size*percent/1000); // макс ширина окна - 1/10 от размера блока данных
     frame_size = frame_size >>1;
     frame_size = (frame_size <<1) + 1;
     int frame_shift = frame_size >> 1;
     long double frame_sum = 0;
-//    for (i = 0; i<frame_shift; i++) pTmp[i] = pOut[i];
-//    for (i = block_size-frame_shift; i<block_size; i++) pTmp[i] = pOut[i];
     for (i = 0; i<frame_size; i++)  frame_sum += pOut[i];
     pTmp[frame_shift] = frame_sum / frame_size;
 
-//    kmin = 1 - percent / 100;
-//    treshold = dmax / 1E15;  // значение 1E15 по физическому смыслу - соотношение сигнал/шум
     for (i = 1; i < block_size-frame_size+1; i++)
     {
 //        frame_sum = frame_sum - pOut[i-1] + pOut[i+frame_size-1];
         frame_sum = 0;
         for (int n = i; n < i+frame_size; n++) frame_sum += pOut[n];
         pTmp[i+frame_shift] = frame_sum / frame_size;
-//        delta = pOut[i] - (pOut[i+1] + pOut[i-1]) / 2;
-//        if (fabs(delta) > treshold) continue;
-//        k = 1 - (pow(delta/dmax, 2) * (1 - kmin) + kmin);
-//        dc = delta * k;
-//        pOut[i] -=dc;
     }
     for (i = 0; i<frame_shift; i++) pTmp[i] = pTmp[frame_shift];
     for (i = block_size-frame_shift; i<block_size; i++) pTmp[i] = pTmp[block_size-frame_shift-1];
+
+//    _f64 pmin = 1E15, pmax = 0;
+//    for (i = 0; i < block_size; i++)
+//    {
+//        if (pTmp[i] > pmax) pmax = pTmp[i];
+//        if (pTmp[i] < pmin) pmin = pTmp[i];
+//    }
+//
+//    long double treshold = (pmax-pmin)*2/3;
+//    frame_size = 9;
+//    frame_shift = 4;
+//    for (i=0; i<block_size; i++)
+//    {
+//        if (pTmp[i] > treshold)
+//        {
+//            frame_sum = 0;
+//            for (int n = 0; n < frame_size; n++) frame_sum += pOut[i+n-frame_shift-1];
+//            pTmp[i-2] = frame_sum / frame_size;
+//        }
+//    }
+
     for (i = 0; i < block_size; i++) pOut[i] = pTmp[i];
 //    memcpy(pOut, pTmp, block_size);
     free(pTmp);
+
+
+
+//// =======================================================
+//// вариант интегрирования (branch integral)
+//    long double dc, kmin, treshold;
+////percent = 90;
+//    long double sum = 0;
+//    int cnt = 0;
+//    kmin = 1 - percent / 100;
+//    treshold = dmax / 1E6;  // значение 1E15 по физическому смыслу - соотношение сигнал/шум
+////    treshold = ymax / 1E6;  // значение 1E15 по физическому смыслу - соотношение сигнал/шум
+//    for (i = 1; i < block_size; i++)
+//    {
+//        delta = pOut[i] - pOut[i-1];
+//        if (fabs(delta) > treshold) continue;
+////        if (pOut[i] > treshold || pOut[i-1] > treshold) continue;
+//        cnt++;
+//        sum += (pOut[i] + pOut[i-1]) /2;
+//        k = 1 - (pow(delta/dmax, 2) * (1 - kmin) + kmin);
+//        dc = (pOut[i] - sum / cnt) * k;
+//        pOut[i] -= dc;
+//    }
 
 
 
