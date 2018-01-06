@@ -148,11 +148,13 @@ double k = 0.1;
     long double sum = 0;
     int cnt = 0;
     kmin = 1 - percent / 100;
-    treshold = dmax / 1E15;  // значение 1E15 по физическому смыслу - соотношение сигнал/шум
+    treshold = dmax / 1E6;  // значение 1E15 по физическому смыслу - соотношение сигнал/шум
+//    treshold = ymax / 1E6;  // значение 1E15 по физическому смыслу - соотношение сигнал/шум
     for (i = 1; i < block_size; i++)
     {
         delta = pOut[i] - pOut[i-1];
         if (fabs(delta) > treshold) continue;
+//        if (pOut[i] > treshold || pOut[i-1] > treshold) continue;
         cnt++;
         sum += (pOut[i] + pOut[i-1]) /2;
         k = 1 - (pow(delta/dmax, 2) * (1 - kmin) + kmin);
