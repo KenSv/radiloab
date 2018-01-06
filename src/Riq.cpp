@@ -84,7 +84,7 @@ void filter(_u8* pIn, _f64* pOut, int block_size, float percent = 100)
 //        if (fabs(delta) > dmax) dmax = pOut[i];
 //        pKoef[i] = delta;
     }
-double k = 0.1;
+//double k = 0.1;
 //double mult, div;
 //    for (i=0; i < block_size; i++)
 //    {
@@ -141,19 +141,58 @@ double k = 0.1;
 //    }
 
 // =======================================================
-// вариант со сглаживанием дельты по трем точкам (triangle)
-    long double dc, kmin, treshold;
-percent = 98;
-    kmin = 1 - percent / 100;
-    treshold = dmax / 1E15;  // значение 1E15 по физическому смыслу - соотношение сигнал/шум
-    for (i = 1; i < block_size - 1; i++)
+// вариант со сглаживанием в рамках скользящего окна
+//    long double dc, kmin, treshold;
+//percent = 90;
+    _f64* pTmp;
+    pTmp  = (_f64*) malloc(block_size * sizeof(_f64));
+//    int frame_size = 11;
+    int frame_size = round(block_size*0.1);
+    frame_size = frame_size >>1;
+    frame_size = (frame_size <<1) + 1;
+    int frame_shift = frame_size >> 1;
+    long double frame_sum = 0;
+//    for (i = 0; i<frame_shift; i++) pTmp[i] = pOut[i];
+//    for (i = block_size-frame_shift; i<block_size; i++) pTmp[i] = pOut[i];
+    for (i = 0; i<frame_size; i++)  frame_sum += pOut[i];
+    pTmp[frame_shift] = frame_sum / frame_size;
+
+//    kmin = 1 - percent / 100;
+//    treshold = dmax / 1E15;  // значение 1E15 по физическому смыслу - соотношение сигнал/шум
+    for (i = 1; i < block_size-frame_size+1; i++)
     {
-        delta = pOut[i] - (pOut[i+1] + pOut[i-1]) / 2;
-        if (fabs(delta) > treshold) continue;
-        k = 1 - (pow(delta/dmax, 2) * (1 - kmin) + kmin);
-        dc = delta * k;
-        pOut[i] -=dc;
+//        frame_sum = frame_sum - pOut[i-1] + pOut[i+frame_size-1];
+        frame_sum = 0;
+        for (int n = i; n < i+frame_size; n++) frame_sum += pOut[n];
+        pTmp[i+frame_shift] = frame_sum / frame_size;
+//        delta = pOut[i] - (pOut[i+1] + pOut[i-1]) / 2;
+//        if (fabs(delta) > treshold) continue;
+//        k = 1 - (pow(delta/dmax, 2) * (1 - kmin) + kmin);
+//        dc = delta * k;
+//        pOut[i] -=dc;
     }
+    for (i = 0; i<frame_shift; i++) pTmp[i] = pTmp[frame_shift];
+    for (i = block_size-frame_shift; i<block_size; i++) pTmp[i] = pTmp[block_size-frame_shift-1];
+    for (i = 0; i < block_size; i++) pOut[i] = pTmp[i];
+//    memcpy(pOut, pTmp, block_size);
+    free(pTmp);
+
+
+
+//// =======================================================
+//// вариант со сглаживанием дельты по трем точкам (triangle)
+//    long double dc, kmin, treshold;
+//percent = 98;
+//    kmin = 1 - percent / 100;
+//    treshold = dmax / 1E15;  // значение 1E15 по физическому смыслу - соотношение сигнал/шум
+//    for (i = 1; i < block_size - 1; i++)
+//    {
+//        delta = pOut[i] - (pOut[i+1] + pOut[i-1]) / 2;
+//        if (fabs(delta) > treshold) continue;
+//        k = 1 - (pow(delta/dmax, 2) * (1 - kmin) + kmin);
+//        dc = delta * k;
+//        pOut[i] -=dc;
+//    }
 
 //// =======================================================
 //// вариант со сглаживанием дельты в два прохода в прямом и обратном направлении
